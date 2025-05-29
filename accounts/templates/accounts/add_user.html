@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  .full-height {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+  }
+</style>
+
+<div class="container-fluid full-height bg-light">
+  <div class="card shadow-lg p-4 rounded-4 w-100" style="max-width: 700px;">
+    <h2 class="text-center mb-3">Ajouter un utilisateur</h2>
+
+    <form method="post" enctype="multipart/form-data" id="registrationForm">
+      {% csrf_token %}
+
+      {% for field in form %}
+      <div class="row mb-3 align-items-center">
+        <label for="{{ field.id_for_label }}" class="col-sm-4 col-form-label">{{ field.label }}</label>
+        <div class="col-sm-8">
+          <div class="input-group">
+            <span class="input-group-text bg-light">
+              <i data-feather="{% if 'email' in field.name %}mail{% elif 'password' in field.name %}lock{% elif 'photo' in field.name %}image{% else %}user{% endif %}"></i>
+            </span>
+            {{ field|add_class:"form-control" }}
+          </div>
+          {% if field.help_text %}
+          <div class="form-text">{{ field.help_text }}</div>
+          {% endif %}
+          {% if field.errors %}
+          <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary px-4">Créer l’utilisateur</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Feather icons -->
+<script src="https://unpkg.com/feather-icons"></script>
+<script>feather.replace()</script>
+{% endblock %}

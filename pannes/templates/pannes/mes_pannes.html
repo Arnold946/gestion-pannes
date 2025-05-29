@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid px-4">
+
+  <!-- Barre d'actions et filtres -->
+  <div class="row mt-4 mx-0">
+    <div class="col bg-white shadow-sm p-2 rounded-1">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex gap-2">
+          <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAjoutPanne">
+            <i class="bi bi-plus-circle me-2"></i>Nouvelle Panne
+          </a>
+          <a href="{% url 'pannes:exporter' %}" class="btn btn-secondary">
+            <i class="bi bi-download me-2"></i>Exporter
+          </a>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <input type="text" class="form-control form-control-sl" placeholder="Rechercher...">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau des pannes -->
+  <div class="row mt-4">
+    <div class="col">
+      <div class="card shadow rounded-1">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle me-2"></i>Liste des pannes
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th class="text-center">Détails</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Écran noir</td>
+                <td>Le PC ne démarre plus</td>
+                <td><span class="badge bg-danger">Élevée</span></td>
+                <td><span class="badge bg-secondary">Non traitée</span></td>
+                <td>19/05/2025</td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
+                </td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Connexion Internet</td>
+                <td>Très lente dans le bureau B</td>
+                <td><span class="badge bg-warning text-dark">Moyenne</span></td>
+                <td><span class="badge bg-success">Résolue</span></td>
+                <td>18/05/2025</td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
+                </td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Imprimante HS</td>
+                <td>Erreur bourrage papier</td>
+                <td><span class="badge bg-primary">Faible</span></td>
+                <td><span class="badge bg-warning text-dark">En cours</span></td>
+                <td>17/05/2025</td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
+                </td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+              <!-- Autres lignes -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="card-footer d-flex justify-content-end">
+          <nav>
+            <ul class="pagination mb-0">
+              <li class="page-item disabled"><a class="page-link" href="#">Précédent</a></li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">Suivant</a></li>
+            </ul>
+          </nav>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal : Formulaire d'ajout -->
+<div class="modal fade" id="modalAjoutPanne" tabindex="-1" aria-labelledby="panneModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="panneModalLabel"><i class="bi bi-exclamation-triangle me-2"></i> Déclarer une panne</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-2">
+            <label for="{{ form.titre.id_for_label }}" class="form-label">Titre</label>
+            {{ form.titre|add_class:"form-control" }}
+          </div>
+          <div class="mb-2">
+            <label for="{{ form.description.id_for_label }}" class="form-label description-fixed">Description</label>
+            {{ form.description|add_class:"form-control description-fixed"}}
+          </div>
+
+          <div class="mb-2">
+            <label for="{{ form.priority.id_for_label }}" class="form-label">Priorité</label>
+            {{ form.priority|add_class:"form-select" }}
+          </div>
+          <div class="mb-2">
+            <label for="{{ form.categorie_materiel.id_for_label }}" class="form-label">Catégorie de matériel</label>
+            <select name="categorie_materiel"
+              id="id_categorie_materiel"
+              class="form-select"
+              hx-get="{% url 'pannes:charger_materiels' %}"
+              hx-target="#id_materiel"
+              hx-trigger="change">
+              <option value="">---------</option>
+              {% for categorie in categories %}
+                <option value="{{ categorie.id }}">{{ categorie.nom }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <select name="materiel" id="id_materiel" class="form-select">
+            <option value="">---------</option>
+            {% for materiel in form.fields.materiel.queryset %}
+              <option value="{{ materiel.id }}">{{ materiel.nom }}</option>
+            {% endfor %}
+          </select>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Soumettre</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

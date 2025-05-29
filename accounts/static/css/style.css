@@ -1,0 +1,178 @@
+:root {
+    --sidebar-width: 250px;
+
+        --primary-color: #4361ee;
+        --secondary-color: #2ec4b6;
+        --background-light: #f8f9fa;
+        --text-color: #2b2d42;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    padding: 0;
+    margin: 0;
+}
+
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+#sidebar {
+    width: var(--sidebar-width);
+    position: fixed;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar .sidebar-header {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    flex-grow: 1;
+}
+
+#sidebar ul li a {
+    padding: 10px 20px;
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+#sidebar ul li a:hover,
+#sidebar ul li.active > a {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* Main Content */
+#content {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+/* Search Box */
+.search-box .form-control {
+    border-radius: 20px;
+    padding-left: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23495057' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+
+/* Icons */
+.icons a {
+    color: #495057;
+    font-size: 1.2rem;
+    text-decoration: none;
+}
+
+/* Technicians List */
+.technician-item {
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.technician-item:hover {
+    background-color: #f8f9fa;
+}
+
+.progress {
+    height: 6px;
+}
+
+/* User Profile */
+.user-profile img {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-profile a {
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.user-profile a:hover {
+    color: #fff !important;
+}
+
+#map {
+    height: 300px;
+    border-radius: 8px;
+}
+
+/* table */
+/* Empêche le dépassement vertical et ajoute un scroll */
+.table-scroll-container {
+    max-height: calc(100vh - 200px); /* ajuste selon ton layout (navbar, marges...) */
+    overflow-y: auto;
+}
+
+/* Fixe l'en-tête du tableau pendant le scroll */
+.table-scroll-container thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa; /* ou #fff pour correspondre à table-light */
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Scrollbar pour Chrome, Edge et Opera */
+.div-scrollable::-webkit-scrollbar {
+    width: 8px; /* largeur de la barre */
+}
+
+.div-scrollable::-webkit-scrollbar-track {
+    background: #f1f1f1; /* couleur de fond du track */
+    border-radius: 8px;
+}
+
+.div-scrollable::-webkit-scrollbar-thumb {
+    background-color: #4361ee; /* couleur du "thumb" (la partie qu'on déplace) */
+    border-radius: 8px;
+    border: 2px solid #f1f1f1; /* un peu d'espace autour */
+}
+
+/* Scrollbar pour Firefox */
+.div-scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: #4361ee #f1f1f1;
+}
+
+.description-fixed {
+    height: 20px !important;       /* Hauteur fixe */
+    resize: none !important;        /* Désactive le redimensionnement */
+}
+
+
+
+
