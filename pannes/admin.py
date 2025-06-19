@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from pannes.models import Panne
+from pannes.models import Panne, AffectationPanne
 
 
 # Register your models here.
@@ -8,3 +8,6 @@ from pannes.models import Panne
 class PanneAdmin(admin.ModelAdmin):
     list_display = ['id', 'titre','materiel','user']
 
+@admin.register(AffectationPanne)
+class AffectationPanneAdmin(admin.ModelAdmin):
+    list_display = ['id','panne','technicien']

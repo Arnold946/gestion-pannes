@@ -1,0 +1,67 @@
+<ul class="list-unstyled components">
+  <li class="active">
+    <a href="{% url 'accounts:admin_dashboard' %}">
+      <i class="bi bi-grid-fill me-2"></i>Gestion des pannes
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'pannes:liste_pannes' %}">
+      <i class="bi bi-ticket-fill me-2"></i>Tickets
+    </a>
+  </li>
+  <li>
+    <a href="{% url 'accounts:liste_utilisateurs' %}">
+      <i class="bi bi-people-fill me-2"></i>Utilisateurs
+    </a>
+  </li>
+
+  <!-- Sous-menu Rapports -->
+  <li>
+    <a href="#submenuRapport" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+      <i class="bi bi-file-text-fill me-2"></i>Rapports
+    </a>
+    <ul class="collapse list-unstyled ps-4" id="submenuRapport">
+      <li>
+          <a href="{% url 'rapports:synthese' %}">
+              <i class="fas fa-chart-line me-2"></i>
+              Rapport de synthèse
+          </a>
+      </li>
+      <li>
+          <a href="{% url 'rapports:detaille' %}">
+              <i class="fas fa-list-alt me-2"></i>
+              Rapport détaillé
+          </a>
+      </li>
+      <li>
+          <a href="{% url 'rapports:statistique' %}">
+              <i class="fas fa-chart-pie me-2"></i>
+              Rapport statistique
+          </a>
+      </li>
+      <li>
+          <a href="{% url 'rapports:performance' %}">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Rapport performance
+          </a>
+      </li>
+      <li>
+          <a href="{% url 'rapports:maintenance' %}">
+              <i class="fas fa-wrench me-2"></i>
+              Rapport maintenance
+          </a>
+      </li>
+    </ul>
+  </li>
+
+  <li>
+    <a href="{% url 'accounts:permission' %}">
+      <i class="bi bi-shield-check me-2"></i>Permissions
+    </a>
+  </li>
+  <li>
+    <a href="#">
+      <i class="bi bi-gear-fill me-2"></i>Paramètres
+    </a>
+  </li>
+</ul>

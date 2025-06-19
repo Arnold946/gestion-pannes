@@ -40,11 +40,6 @@ class AffectationPanne(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['panne', 'technicien'], name='unique_affectation')
         ]
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['technicien'].queryset = User.objects.filter(role__name='technicien')
-        self.fields['panne'].queryset = self.fields['panne'].queryset.filter(status='nouvelle')
 
     def __str__(self):
         return f'{self.panne.description} - {self.technicien.username} - {self.date_affectation}'

@@ -153,14 +153,15 @@
               hx-trigger="change">
               <option value="">---------</option>
               {% for categorie in categories %}
-                <option value="{{ categorie.id }}">{{ categorie.nom }}</option>
+                <option value="{{ categorie.id }}">{{ categorie.name }}</option>
               {% endfor %}
             </select>
           </div>
+
           <select name="materiel" id="id_materiel" class="form-select">
             <option value="">---------</option>
             {% for materiel in form.fields.materiel.queryset %}
-              <option value="{{ materiel.id }}">{{ materiel.nom }}</option>
+              <option value="{{ materiel.id }}">{{ materiel.name }}</option>
             {% endfor %}
           </select>
 

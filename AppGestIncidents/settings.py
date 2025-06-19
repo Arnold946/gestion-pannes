@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'organisation',  # Custom app for organization management
     'materiels',  # Custom app for material management
     'pannes',  # Custom app for incident management
+    'rapport',
     'widget_tweaks',
 ]
 
@@ -52,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'accounts.middlewares.ForcePasswordChangeMiddleware',  # Middleware pour forcer le changement de mot de passe
+    'accounts.middlewares.ForcePasswordChangeMiddleware',  # Middleware pour forcer le changement de mot de passe
 ]
 
 ROOT_URLCONF = 'AppGestIncidents.urls'
@@ -152,7 +153,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'arnoldtsobeng@gmail.com'  # Ton adresse Gmail
-EMAIL_HOST_PASSWORD = 'dvmf ymsi jqzb fsyr'  # Voir explication ci-dessous
+EMAIL_HOST_PASSWORD = 'qmid npkm nikm zdkr'  # Voir explication ci-dessous
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 AUTHENTICATION_BACKENDS = [

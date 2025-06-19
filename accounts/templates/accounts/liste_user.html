@@ -10,144 +10,210 @@
   <div class="row mt-4 mx-0">
     <div class="col bg-white shadow-sm p-2 rounded-4">
       <div class="d-flex align-items-center gap-2">
-        <!-- BOUTON D'OUVERTURE DU MODAL -->
         {% if peut_ajouter %}
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ajoutUtilisateurModal">
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#ajoutUtilisateurModal">
           <i class="bi bi-person-add me-2"></i>Ajouter
         </button>
         {% endif %}
-        <button type="button" class="btn btn-success">
-          <i class="bi bi-key me-2"></i>Droits
-        </button>
-        <button type="button" class="btn btn-secondary">
+        <button type="button" class="btn btn-outline-secondary">
           <i class="bi bi-download me-2"></i>Exporter
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Tableau des utilisateurs -->
-  <div class="row mt-4">
-    <div class="col">
-      <div class="card shadow rounded-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">
-            <i class="bi bi-people me-2"></i>Liste des utilisateurs
-          </h5>
+  <!-- Onglets -->
+  <div class="pt-3">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="#actifs" data-bs-toggle="tab">Actifs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#desactives" data-bs-toggle="tab">
+          <i class="bi bi-person-x"></i> Désactivés
+        </a>
+      </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+
+      <!-- Utilisateurs actifs -->
+      <div class="tab-pane fade show active" id="actifs">
+        <div class="card shadow rounded-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-people me-2"></i>Liste des utilisateurs actifs</h5>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Rôle</th>
+                  <th>Unité</th>
+                  <th class="text-center">Detail</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in utilisateurs_actifs %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.role.name }}</td>
+                  <td>{{ user.unite.name }}</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
+                    <form method="post" action="{% url 'accounts:desactiver_utilisateur' user.id %}" class="form-desactivation d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-danger" data-nom="{{ user.username }}">
+                        <i class="bi bi-person-x"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Aucun utilisateur actif.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="card-body p-0">
-          <table class="table table-hover mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>#</th>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Unité</th>
-                <th class="text-center">Detail</th>
-                <th class="text-center">Attribuer</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user in utilisateurs %}
-              <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ user.get_full_name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role.nom }}</td>
-                <td>{{ user.unite.nom }}</td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-info">
-                    <i class="bi bi-eye"></i>
-                  </button>
-                </td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-info">
-                    <i class="bi bi-hammer"></i>
-                  </button>
-                </td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-warning me-1">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn btn-sm btn-danger">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="8" class="text-center text-muted">Aucun utilisateur enregistré.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      </div>
+
+      <!-- Utilisateurs désactivés -->
+      <div class="tab-pane fade" id="desactives">
+        <div class="card shadow rounded-4">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-person-x me-2"></i>Utilisateurs désactivés</h5>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Rôle</th>
+                  <th>Unité</th>
+                  <th class="text-center">Detail</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in utilisateurs_inactifs %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.role.name }}</td>
+                  <td>{{ user.unite.name }}</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
+                  </td>
+                  <td class="text-center">
+                    <form method="post" action="{% url 'accounts:reactiver_utilisateur' user.id %}">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-success" title="Réactiver l'utilisateur">
+                        <i class="bi bi-person-check"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Aucun utilisateur désactivé.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal ajout utilisateur -->
+  {% if peut_ajouter %}
+  <div class="modal fade" id="ajoutUtilisateurModal" tabindex="-1" aria-labelledby="ajoutUtilisateurLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="ajoutUtilisateurLabel">Ajouter un utilisateur</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body">
+            {% if form.errors %}
+            <div class="alert alert-danger">{{ form.errors }}</div>
+            {% endif %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label>{{ form.username.label }}</label>
+                {% render_field form.username class="form-control" %}
+                <label>{{ form.last_name.label }}</label>
+                {% render_field form.last_name class="form-control" %}
+                <label>{{ form.email.label }}</label>
+                {% render_field form.email class="form-control" %}
+                <label>{{ form.phone_number.label }}</label>
+                {% render_field form.phone_number class="form-control" %}
+                <label>{{ form.role.label }}</label>
+                {% render_field form.role class="form-select" %}
+              </div>
+              <div class="col-md-6">
+                <label>{{ form.profile_picture.label }}</label>
+                {% render_field form.profile_picture class="form-control" %}
+                <label>{{ form.unite.label }}</label>
+                {% render_field form.unite class="form-select" %}
+                <label>{{ form.password.label }}</label>
+                {% render_field form.password class="form-control" %}
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Créer l'utilisateur</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+  {% endif %}
 
 </div>
 
-<!--  MODAL D’AJOUT UTILISATEUR -->
-{% if peut_ajouter %}
-<div class="modal fade" id="ajoutUtilisateurModal" tabindex="-1" aria-labelledby="ajoutUtilisateurLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="modal-header">
-          <h5 class="modal-title" id="ajoutUtilisateurLabel">Ajouter un utilisateur</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-          {% if form.errors %}
-          <div class="alert alert-danger">
-            {{ form.errors }}
-          </div>
-          {% endif %}
+{% endblock %}
 
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label>{{ form.username.label }}</label>
-              {% render_field form.username class="form-control g-3" %}
+{% block scripts %}
+  <script>
+  document.querySelectorAll(".form-desactivation").forEach(form => {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault(); // Bloque la soumission automatique
+      const username = form.querySelector("button").getAttribute("data-nom");
 
-              <label>{{ form.last_name.label }}</label>
-              {% render_field form.last_name class="form-control" %}
-
-              <label>{{ form.email.label }}</label>
-              {% render_field form.email class="form-control" %}
-
-              <label>{{ form.phone_number.label }}</label>
-              {% render_field form.phone_number class="form-control" %}
-
-              <label>{{ form.role.label }}</label>
-              {% render_field form.role class="form-select" %}
-            </div>
-
-            <div class="col-md-6">
-              <label>{{ form.profile_picture.label }}</label>
-              {% render_field form.profile_picture class="form-control" %}
-
-              <label>{{ form.unite.label }}</label>
-              {% render_field form.unite class="form-select" %}
-
-              <label>{{ form.password.label }}</label>
-              {% render_field form.password class="form-control" %}
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" class="btn btn-primary">Créer l'utilisateur</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-{% endif %}
-
-
+      Swal.fire({
+        title: "Confirmer la désactivation",
+        text: `Voulez-vous vraiment désactiver ${username} ?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Oui, désactiver",
+        cancelButtonText: "Annuler",
+        confirmButtonColor: "#dc3545",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit(); // Soumet le formulaire si confirmé
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-4">
+      <div class="row mt-4 mx-0">
+    <div class="col bg-white shadow-sm p-2 rounded-1">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex gap-2">
+          <a href="{% url 'pannes:exporter' %}" class="btn btn-secondary">
+            <i class="bi bi-download me-2"></i>Exporter
+          </a>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <input type="text" class="form-control form-control-sl" placeholder="Rechercher...">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Filtres -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label for="filtre-priorite" class="form-label">Filtrer par priorité :</label>
+      <select id="filtre-priorite" class="form-select">
+        <option value="">Toutes</option>
+        <option value="Élevée">Élevée</option>
+        <option value="Moyenne">Moyenne</option>
+        <option value="Faible">Faible</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="filtre-statut" class="form-label">Filtrer par statut :</label>
+      <select id="filtre-statut" class="form-select">
+        <option value="">Tous</option>
+        <option value="En cours">En cours</option>
+        <option value="Terminée">Terminée</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Mes Pannes Affectées</h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0" id="table-pannes">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Titre</th>
+            <th>Description</th>
+            <th>Priorité</th>
+            <th>Attribuée par</th>
+            <th>Date d'affectation</th>
+            <th>Statut</th>
+            <th>Date d'intervention</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Exemple de lignes (à générer dynamiquement si besoin) -->
+          <tr>
+            <td>1</td>
+            <td>Écran noir</td>
+            <td>Le PC ne démarre plus</td>
+            <td class="priorite">Élevée</td>
+            <td>Chef A</td>
+            <td>01/06/2025 10:15</td>
+            <td class="statut">
+              <select class="form-select form-select-sm statut-select">
+                <option value="En cours" selected>En cours</option>
+                <option value="Terminée">Terminée</option>
+              </select>
+            </td>
+            <td>--</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Connexion lente</td>
+            <td>Internet très lent</td>
+            <td class="priorite">Moyenne</td>
+            <td>Chef B</td>
+            <td>02/06/2025 11:30</td>
+            <td class="statut">
+              <select class="form-select form-select-sm statut-select">
+                <option value="En cours" selected>En cours</option>
+                <option value="Terminée">Terminée</option>
+              </select>
+            </td>
+            <td>03/06/2025 14:00</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Imprimante HS</td>
+            <td>Bourrage papier</td>
+            <td class="priorite">Faible</td>
+            <td>Chef C</td>
+            <td>04/06/2025 09:00</td>
+            <td class="statut">
+              <select class="form-select form-select-sm statut-select">
+                <option value="En cours" selected>En cours</option>
+                <option value="Terminée">Terminée</option>
+              </select>
+            </td>
+            <td>--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- JS : Filtrage côté client -->
+<script>
+  const filtrePriorite = document.getElementById('filtre-priorite');
+  const filtreStatut = document.getElementById('filtre-statut');
+  const lignes = document.querySelectorAll('#table-pannes tbody tr');
+
+  function filtrerLignes() {
+    const priorite = filtrePriorite.value;
+    const statut = filtreStatut.value;
+
+    lignes.forEach(row => {
+      const p = row.querySelector('.priorite').textContent.trim();
+      const s = row.querySelector('.statut').textContent.trim();
+
+      const visible =
+        (priorite === '' || p === priorite) &&
+        (statut === '' || s === statut);
+
+      row.style.display = visible ? '' : 'none';
+    });
+  }
+
+  filtrePriorite.addEventListener('change', filtrerLignes);
+  filtreStatut.addEventListener('change', filtrerLignes);
+</script>
+
+{% endblock %}

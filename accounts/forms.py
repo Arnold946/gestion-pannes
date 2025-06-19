@@ -43,6 +43,39 @@ class UserCreationFormCustom(forms.ModelForm):
         model = User
         fields = ('username', 'email', 'role', 'phone_number', 'profile_picture', 'password', 'unite')
 
+
+class ModifierUtilisateurForm(forms.ModelForm):
+
+    role = forms.ModelChoiceField(
+        queryset=Role.objects.all(),
+        required=True,
+        empty_label="veuillez selectionner un role"
+    )
+    profile_picture = forms.ImageField(
+        label='Photo de profil',
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'multiple': False})
+    )
+    unite = forms.ModelChoiceField(
+        queryset=Unite.objects.all(),
+        required=True,
+        empty_label="veuillez selectionner une unite"
+    )
+    phone_number = forms.CharField(
+        label='Numéro de téléphone',
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Numéro de téléphone'})
+    )
+    password = forms.CharField(
+        widget=forms.TextInput(attrs={'readonly': 'readonly'}),
+        initial=generate_temporary_password,
+        help_text="Un mot de passe temporaire sera généré automatiquement et envoyé par e-mail."
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'role', 'phone_number', 'profile_picture', 'password', 'unite')
+
 class EmailLoginForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=254)
     password = forms.CharField(label='Mot de passe', widget=forms.PasswordInput)

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% load static %}
+{% block page_title %}Permissions{% endblock %}
+{% block content %}
+    <div class="container mt-2">
+      <div class="row mt-3 mx-0">
+    <div class="col bg-white shadow-sm p-2 rounded-4">
+      <div class="d-flex align-items-center gap-2">
+        <!-- BOUTON D'OUVERTURE DU MODAL -->
+
+        <button class="btn btn-light btn-sm text-primary" data-bs-toggle="modal" data-bs-target="#modalAjoutPermission">
+          <i class="bi bi-plus-circle me-1"></i> Ajouter une permission
+        </button>
+
+        <button type="button" class="btn btn-light btn-sm text-secondary">
+          <i class="bi bi-download me-2"></i>Exporter
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card shadow-sm border-0 mt-3">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">
+        <i class="bi bi-shield-check me-2"></i>Permissions par Rôle et Interface
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-borderless align-middle mb-0">
+          <thead class="bg-light text-dark">
+            <tr>
+              <th scope="col">#</th>
+              <th>Rôle</th>
+              <th>Interface</th>
+              <th>Voir</th>
+              <th>Modifier</th>
+              <th>Supprimer</th>
+              <th>Ajouter</th>
+              <th>Télécharger</th>
+              <th>Imprimer</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in permissions %}
+            <tr>
+              <th scope="row">{{ p.id }}</th>
+              <td><span class="fw-semibold">{{ p.role.name }}</span></td>
+              <td>{{ p.interface.name }}</td>
+              <td>
+                {% if p.peut_voir %}
+                  <span class="badge bg-success">Oui</span>
+                {% else %}
+                  <span class="badge bg-danger">Non</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.peut_modifier %}
+                  <span class="badge bg-success">Oui</span>
+                {% else %}
+                  <span class="badge bg-danger">Non</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.peut_supprimer %}
+                  <span class="badge bg-success">Oui</span>
+                {% else %}
+                  <span class="badge bg-danger">Non</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.peut_ajouter %}
+                  <span class="badge bg-success">Oui</span>
+                {% else %}
+                  <span class="badge bg-danger">Non</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.peut_telecharger %}
+                  <span class="badge bg-success">Oui</span>
+                {% else %}
+                  <span class="badge bg-danger">Non</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.peut_imprimer %}
+                  <span class="badge bg-success">Oui</span>
+                {% else %}
+                  <span class="badge bg-danger">Non</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="text-center text-muted">Aucune permission définie.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal d'ajout de permission -->
+<div class="modal fade" id="modalAjoutPermission" tabindex="-1" aria-labelledby="modalAjoutPermissionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <form method="post" action="">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAjoutPermissionLabel">
+            <i class="bi bi-plus-circle me-2"></i>Ajouter une Permission Interface
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+
+        <div class="modal-body row g-3">
+          <div class="col-md-6">
+            <label for="role" class="form-label">Rôle :</label>
+            <select class="form-select" id="role" name="role" required>
+              <option value="" disabled selected>---------</option>
+
+                <option value="{{ role.id }}"></option>
+
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="interface" class="form-label">Interface :</label>
+            <select class="form-select" id="interface" name="interface" required>
+              <option value="" disabled selected>---------</option>
+
+                <option value="{{ interface.id }}"></option>
+
+            </select>
+          </div>
+
+          <div class="col-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="peut_voir" id="peut_voir">
+              <label class="form-check-label" for="peut_voir">Peut voir</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="peut_modifier" id="peut_modifier">
+              <label class="form-check-label" for="peut_modifier">Peut modifier</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="peut_supprimer" id="peut_supprimer">
+              <label class="form-check-label" for="peut_supprimer">Peut supprimer</label>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="peut_ajouter" id="peut_ajouter">
+              <label class="form-check-label" for="peut_ajouter">Peut ajouter</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="peut_telecharger" id="peut_telecharger">
+              <label class="form-check-label" for="peut_telecharger">Peut télécharger</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="peut_imprimer" id="peut_imprimer">
+              <label class="form-check-label" for="peut_imprimer">Peut imprimer</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Ajouter</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

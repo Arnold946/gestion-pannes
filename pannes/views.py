@@ -1,29 +1,64 @@
 import openpyxl
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from openpyxl.styles import Font, PatternFill, Alignment
 
-from accounts.models import PermissionInterface
+from accounts.models import PermissionInterface, User
 from materiels.models import Materiel, CategorieMateriel
 from pannes.forms import AffectationPanneForm, PanneForm
-from pannes.models import Panne
+from pannes.models import Panne, AffectationPanne, Notification
 
 
 # Create your views here.
+def liste_pannes_et_techniciens_view(request):
+    pannes = Panne.objects.all()
+    techniciens = User.objects.filter(role__name='technicien')
+    pannes_non_attribuees = Panne.objects.filter(affectation_panne__isnull=True)
+
+    context={
+        'pannes':pannes,
+        'techniciens':techniciens,
+        'pannes_non_attribuees':pannes_non_attribuees
+    }
+
+    return render(request, 'pannes/liste_pannes.html', context)
 
 def affecter_pannes_view(request):
     if request.method == 'POST':
-        form = AffectationPanneForm(request.POST)
-        if form.is_valid():
-            affectation = form.save(commit=False)
-            affectation.attribuer_par = request.user
-            affectation.save()
-            return redirect('affecter_pannes.html')
-    else:
-        form = AffectationPanneForm()
-    
-    return render(request, 'pannes/affecter_pannes.html', {'form':form})
+        panne_id = request.POST.get('panne')
+        technicien_id = request.POST.get('technicien')
+
+        try:
+            panne = Panne.objects.get(id=panne_id)
+            technicien = User.objects.get(id=technicien_id, role__name='technicien')
+            chef = request.user
+
+            # Vérifie que l'affectation n'existe pas déjà
+            if AffectationPanne.objects.filter(panne=panne, technicien=technicien).exists():
+                messages.warning(request, "Cette panne est déjà attribuée à ce technicien.")
+            else:
+                AffectationPanne.objects.create(
+                    panne=panne,
+                    technicien=technicien,
+                    attribue_par=chef,
+                    status_reparation= 'Non traitée'
+                )
+
+                Notification.objects.create(
+                    utilisateur=technicien,
+                    panne=panne,
+                    message=f"Panne assignée à {panne.user}",
+                )
+                messages.succes(request, "La panne a bien été atribuée")
+        except Panne.DoesNotExist:
+            messages.error(request, "Panne introuvable.")
+        except User.DoesNotExist:
+            messages.error(request, "Technicien introuvable.")
+
+        return redirect('pannes:liste_pannes')
+    return redirect('pannes:liste_pannes')
 
 def mes_pannes_view(request):
     # Vérifie les permissions
@@ -48,6 +83,12 @@ def mes_pannes_view(request):
     categories = CategorieMateriel.objects.all()
     pannes = Panne.objects.filter(user=request.user)  # liste des pannes à afficher
     return render(request, 'pannes/mes_pannes.html', {'form': form, 'pannes': pannes, 'categories':categories})
+
+def mes_pannes_attribuees(request):
+    return render(request, 'pannes/mes_pannes_attribuees.html')
+
+def liste_pannes_view(request):
+    return render(request, 'pannes/liste_pannes.html')
 
 def exporter_pannes_excel_view(request):
     #creation du classeur et de la feuille
