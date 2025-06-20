@@ -272,3 +272,122 @@ canvas {
 }
 </style>
 {% endblock %}
+
+{% block scripts %}
+    <script>
+        const data1 = {
+          labels: [
+            'Red',
+            'Blue',
+            'Yellow'
+          ],
+          datasets: [{
+            label: 'My First Dataset',
+            data: [300, 50, 100],
+            backgroundColor: [
+              'rgb(255, 99, 132)',
+              'rgb(54, 162, 235)',
+              'rgb(255, 205, 86)'
+            ],
+            hoverOffset: 4
+          }]
+        };
+
+        const config1 = {
+          type: 'doughnut',
+          data: data1,
+        };
+
+        const data2 = {
+          labels: [
+            'Red',
+            'Green',
+            'Yellow',
+            'Grey',
+            'Blue'
+          ],
+          datasets: [{
+            label: 'My First Dataset',
+            data: [11, 16, 7, 3, 14],
+            backgroundColor: [
+              'rgb(255, 99, 132)',
+              'rgb(75, 192, 192)',
+              'rgb(255, 205, 86)',
+              'rgb(201, 203, 207)',
+              'rgb(54, 162, 235)'
+            ]
+          }]
+        };
+
+        const config2 = {
+          type: 'polarArea',
+          data: data2,
+          options: {}
+        };
+
+
+        const data3 = {
+          labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet'],
+          datasets: [{
+            label: 'My First Dataset',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          }]
+        };
+
+        const config3 = {
+          type: 'line',
+          data: data3,
+        };
+
+        const data4 = {
+          labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet'],
+          datasets: [{
+            label: 'My First Dataset',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(255, 159, 64, 0.2)',
+              'rgba(255, 205, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(201, 203, 207, 0.2)'
+            ],
+            borderColor: [
+              'rgb(255, 99, 132)',
+              'rgb(255, 159, 64)',
+              'rgb(255, 205, 86)',
+              'rgb(75, 192, 192)',
+              'rgb(54, 162, 235)',
+              'rgb(153, 102, 255)',
+              'rgb(201, 203, 207)'
+            ],
+            borderWidth: 1
+          }]
+        };
+
+        const config4 = {
+          type: 'bar',
+          data: data4,
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          },
+        };
+        const ctx1 = document.getElementById('chart-type-materiel').getContext('2d');
+        const ctx2 = document.getElementById('chart-localisation').getContext('2d');
+        const ctx3 = document.getElementById('chart-recurrence').getContext('2d');
+        const ctx4 = document.getElementById('chart-satisfaction').getContext('2d');
+        const monGraphique1 = new Chart(ctx1, config1);
+        const monGraphique2 = new Chart(ctx2, config2);
+        const monGraphique3 = new Chart(ctx3, config3);
+        const monGraphique4 = new Chart(ctx4, config4);
+
+    </script>
+{% endblock %}
