@@ -1,8 +1,11 @@
 import openpyxl
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseForbidden
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.template.loader import render_to_string
+from django.utils.timezone import now
+from django.views.decorators.http import require_POST
 from openpyxl.styles import Font, PatternFill, Alignment
 
 from accounts.models import PermissionInterface, User
@@ -16,15 +19,18 @@ def liste_pannes_et_techniciens_view(request):
     pannes = Panne.objects.all()
     techniciens = User.objects.filter(role__name='technicien')
     pannes_non_attribuees = Panne.objects.filter(affectation_panne__isnull=True)
+    pannes_attribuees = AffectationPanne.objects.select_related('panne', 'technicien', 'panne__user')
 
     context={
         'pannes':pannes,
         'techniciens':techniciens,
-        'pannes_non_attribuees':pannes_non_attribuees
+        'pannes_non_attribuees':pannes_non_attribuees,
+        'pannes_attribuees':pannes_attribuees
     }
 
     return render(request, 'pannes/liste_pannes.html', context)
 
+User = get_user_model()
 def affecter_pannes_view(request):
     if request.method == 'POST':
         panne_id = request.POST.get('panne')
@@ -43,7 +49,7 @@ def affecter_pannes_view(request):
                     panne=panne,
                     technicien=technicien,
                     attribue_par=chef,
-                    status_reparation= 'Non traitée'
+                    statut_reparation= 'non_traitee'
                 )
 
                 Notification.objects.create(
@@ -51,7 +57,7 @@ def affecter_pannes_view(request):
                     panne=panne,
                     message=f"Panne assignée à {panne.user}",
                 )
-                messages.succes(request, "La panne a bien été atribuée")
+                messages.success(request, "La panne a bien été atribuée")
         except Panne.DoesNotExist:
             messages.error(request, "Panne introuvable.")
         except User.DoesNotExist:
@@ -85,7 +91,40 @@ def mes_pannes_view(request):
     return render(request, 'pannes/mes_pannes.html', {'form': form, 'pannes': pannes, 'categories':categories})
 
 def mes_pannes_attribuees(request):
-    return render(request, 'pannes/mes_pannes_attribuees.html')
+    technicien = request.user
+    affectations = AffectationPanne.objects.filter(technicien=technicien)
+
+    pannes_non_traitees = affectations.filter(statut_reparation='non_traitee')
+    pannes_en_cours = affectations.filter(statut_reparation='en_cours')
+    pannes_terminees = affectations.filter(statut_reparation='terminee')
+    return render(request, 'pannes/mes_pannes_attribuees.html',{
+        "pannes_non_traitees": pannes_non_traitees,
+        "pannes_en_cours": pannes_en_cours,
+        "pannes_terminees": pannes_terminees,
+    })
+
+def changer_statut_affectation(request, affectation_id):
+    affectation = get_object_or_404(AffectationPanne, id=affectation_id, technicien=request.user)
+    nouveau_statut = request.POST.get('nouveau_statut')
+
+    if nouveau_statut in ['en_cours', 'terminee']:
+        if affectation.statut_reparation == 'non_traitee' and nouveau_statut == 'en_cours':
+            affectation.statut_reparation = 'en_cours'
+            affectation.date_intervention = now()
+            affectation.save()
+        elif affectation.statut_reparation == 'en_cours' and nouveau_statut == 'terminee':
+            affectation.statut_reparation = 'terminee'
+            affectation.date_reparation = now()
+            affectation.save()
+    return redirect('pannes:mes_pannes_attr')
+
+@require_POST
+def prendre_en_charge(request, panne_id):
+    panne = get_object_or_404(Panne, id=panne_id, status='non traitee')
+    panne.status = 'en cours'
+    panne.save()
+    messages.success(request, f'Panne #{panne.id} prise en charge avec succes.')
+    return redirect('pannes:mes-pannes-attr')
 
 def liste_pannes_view(request):
     return render(request, 'pannes/liste_pannes.html')

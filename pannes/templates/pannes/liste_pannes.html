@@ -11,10 +11,10 @@
     <div class="col bg-white shadow-sm p-2 rounded-1">
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div class="d-flex gap-2">
-          <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAjoutPanne">
+          <a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAjoutPanne">
             <i class="bi bi-plus-circle me-2"></i>Attribuer une Panne
           </a>
-          <a href="{% url 'pannes:exporter' %}" class="btn btn-secondary">
+          <a href="{% url 'pannes:exporter' %}" class="btn btn-outline-secondary">
             <i class="bi bi-download me-2"></i>Exporter
           </a>
         </div>
@@ -26,94 +26,139 @@
     </div>
   </div>
 
-  <!-- Tableau des pannes -->
-  <div class="row mt-4">
-    <div class="col">
-      <div class="card shadow rounded-1">
-        <div class="card-header bg-danger text-white">
-          <h5 class="mb-0">
-            <i class="bi bi-exclamation-triangle me-2"></i>Liste des pannes
-          </h5>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-hover mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>#</th>
-                <th>Nom</th>
-                <th>unite</th>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>Priorité</th>
-                <th>Statut</th>
-                <th>Date</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>toto</td>
-                <td>paierie</td>
-                <td>Écran noir</td>
-                <td>Le PC ne démarre plus</td>
-                <td><span class="badge bg-danger">Élevée</span></td>
-                <td><span class="badge bg-secondary">Non traitée</span></td>
-                <td>19/05/2025</td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>tata</td>
-                <td>paierie</td>
-                <td>Connexion Internet</td>
-                <td>Très lente dans le bureau B</td>
-                <td><span class="badge bg-warning text-dark">Moyenne</span></td>
-                <td><span class="badge bg-success">Résolue</span></td>
-                <td>18/05/2025</td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>titi</td>
-                <td>paierie</td>
-                <td>Imprimante HS</td>
-                <td>Erreur bourrage papier</td>
-                <td><span class="badge bg-primary">Faible</span></td>
-                <td><span class="badge bg-warning text-dark">En cours</span></td>
-                <td>17/05/2025</td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                </td>
-              </tr>
-              <!-- Autres lignes -->
-            </tbody>
-          </table>
-        </div>
+  <ul class="nav nav-tabs mt-4" id="tabPannes" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="pannes-tab" data-bs-toggle="tab" data-bs-target="#pannes" type="button" role="tab">📋 Pannes à attribuer</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="attribuees-tab" data-bs-toggle="tab" data-bs-target="#attribuees" type="button" role="tab">🛠️ Pannes déjà attribuées</button>
+    </li>
+  </ul>
 
-        <!-- Pagination -->
-        <div class="card-footer d-flex justify-content-end">
-          <nav>
-            <ul class="pagination mb-0">
-              <li class="page-item disabled"><a class="page-link" href="#">Précédent</a></li>
-              <li class="page-item active"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">Suivant</a></li>
-            </ul>
-          </nav>
-        </div>
+  <div class="tab-content mt-3" id="tabContentPannes">
 
-      </div>
+  <!-- Onglet 1 : Pannes non attribuées -->
+  <div class="tab-pane fade show active" id="pannes" role="tabpanel" aria-labelledby="pannes-tab">
+     <div class="card mt-4 shadow-sm rounded-2">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Pannes non attribuées</h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Titre</th>
+            <th>Utilisateur</th>
+            <th>Priorité</th>
+            <th>Statut</th>
+            <th>Date de signalement</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for panne in pannes_non_attribuees %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ panne.titre }}</td>
+            <td>{{ panne.user.username }}</td>
+            <td>
+              <span class="badge
+                {% if panne.priority == 'haute' %}bg-danger
+                {% elif panne.priority == 'moyenne' %}bg-warning text-dark
+                {% else %}bg-primary
+                {% endif %}">
+                {{ panne.get_priority_display }}
+              </span>
+            </td>
+            <td>
+              <span class="badge
+                {% if panne.status == 'non_traitee' %}bg-secondary
+                {% elif panne.status == 'en_cours' %}bg-warning text-dark
+                {% elif panne.status == 'termine' %}bg-success
+                {% endif %}">
+                {{ panne.get_status_display }}
+              </span>
+            </td>
+            <td>{{ panne.date_signalement|date:"d/m/Y" }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalAjoutPanne">
+                <i class="bi bi-plus-circle"></i> Attribuer
+              </button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center">Aucune panne non attribuée pour le moment.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
+  </div>
+
+  <!-- Onglet 2 : Pannes déjà attribuées -->
+  <div class="tab-pane fade" id="attribuees" role="tabpanel" aria-labelledby="attribuees-tab">
+  <div class="card mt-4 shadow-sm rounded-2">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0"><i class="bi bi-person-check me-2"></i>Pannes attribuées</h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Titre</th>
+            <th>Utilisateur</th>
+            <th>Technicien</th>
+            <th>Statut</th>
+            <th>Date d'affectation</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for affectation in pannes_attribuees %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ affectation.panne.titre }}</td>
+            <td>{{ affectation.panne.user.username }}</td>
+            <td>{{ affectation.technicien.username }}</td>
+            <td>
+              <span class="badge
+                {% if affectation.statut_reparation == 'non_traitee' %}bg-secondary
+                {% elif affectation.statut_reparation == 'en_cours' %}bg-warning text-dark
+                {% elif affectation.statut_reparation == 'terminee' %}bg-success
+                {% endif %}">
+                {{ affectation.get_statut_reparation_display }}
+              </span>
+            </td>
+            <td>{{ affectation.date_affectation|date:"d/m/Y" }}</td>
+            <td class="text-center">
+
+              <!-- Bouton annuler affectation -->
+              <form method="post" action="" class="d-inline" onsubmit="return confirm('Confirmer l\'annulation ?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-x-circle"></i> Annuler
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center">Aucune panne n’a encore été attribuée.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+</div>
+
+
 
 <!-- Modal Attribuer une Panne -->
 <div class="modal fade" id="modalAjoutPanne" tabindex="-1" aria-labelledby="modalAjoutPanneLabel" aria-hidden="true">
@@ -125,7 +170,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
 
-      <form method="post" action="#">
+      <form method="post" action="{% url 'pannes:affecter' %}">
         {% csrf_token %}
         <div class="modal-body">
 
@@ -133,7 +178,7 @@
             <label for="panne" class="form-label">Panne :</label>
             <select class="form-select" id="panne" name="panne" required>
               {% for panne in pannes_non_attribuees %}
-                <option value="{{ panne.id }}">{{ panne.titre }} - {{ panne.user.get_full_name }}</option>
+                <option value="{{ panne.id }}">{{ panne.titre }} - {{ panne.user.username }}</option>
               {% empty %}
                 <option disabled>Aucune panne disponible</option>
               {% endfor %}
@@ -154,8 +199,8 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Attribuer</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-outline-primary">Attribuer</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
         </div>
       </form>
 
@@ -164,5 +209,21 @@
 </div>
 
 </div>
-
+{% endblock %}
+{% block scripts %}
+{% if messages %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      {% for message in messages %}
+        Swal.fire({
+          icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+          title: "{{ message|escapejs }}",
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      {% endfor %}
+    });
+  </script>
+{% endif %}
 {% endblock %}

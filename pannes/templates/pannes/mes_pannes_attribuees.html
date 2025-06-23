@@ -2,139 +2,252 @@
 {% load static %}
 
 {% block content %}
-    <div class="container mt-4">
-      <div class="row mt-4 mx-0">
-    <div class="col bg-white shadow-sm p-2 rounded-1">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <div class="d-flex gap-2">
-          <a href="{% url 'pannes:exporter' %}" class="btn btn-secondary">
-            <i class="bi bi-download me-2"></i>Exporter
-          </a>
-        </div>
-        <div class="d-flex flex-wrap align-items-center gap-2">
-          <input type="text" class="form-control form-control-sl" placeholder="Rechercher...">
+<div class="container mt-4">
 
+  <!-- Bouton Export -->
+  <div class="row container">
+    <div class="col bg-white shadow-sm p-1 rounded-3 mb-3">
+      <a href="{% url 'pannes:exporter' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-download me-2"></i>Exporter
+      </a>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <ul class="nav nav-tabs" id="panne-tabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#non-traite" type="button">Non traitées</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#encours" type="button">En cours</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#termine" type="button">Terminées</button></li>
+  </ul>
+
+  <div class="tab-content pt-3">
+
+    <!-- Non traitées -->
+    <div class="tab-pane fade show active" id="non-traite">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-exclamation-circle me-2"></i>Pannes non traitées</span>
+          <span class="badge bg-secondary">{{ pannes_non_traitees|length }}</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Titre</th>
+                  <th>Description</th>
+                  <th>Priorité</th>
+                  <th>Date signalement</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for affectation in pannes_non_traitees %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ affectation.panne.titre }}</td>
+                  <td>{{ affectation.panne.description }}</td>
+                  <td>
+                    {% if affectation.panne.priority == 'élevée' %}
+                      <span class="badge bg-danger">Élevée</span>
+                    {% elif affectation.panne.priority == 'moyenne' %}
+                      <span class="badge bg-warning text-dark">Moyenne</span>
+                    {% else %}
+                      <span class="badge bg-primary">Faible</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ affectation.panne.date_signalement }}</td>
+                  <td>
+                    <form method="post" action="{% url 'pannes:statut' affectation.id %}" class="form-changement-statut">
+                      {% csrf_token %}
+                      <input type="hidden" name="affectation_id" value="{{ affectation.id }}">
+                      <input type="hidden" name="nouveau_statut" value="en_cours">
+                      <button class="btn btn-sm btn-primary" data-statut="En cours">
+                        <i class="bi bi-play-fill me-1"></i>Prendre en charge
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">Aucune panne non traitée.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- Filtres -->
-  <div class="row mb-3">
-    <div class="col-md-4">
-      <label for="filtre-priorite" class="form-label">Filtrer par priorité :</label>
-      <select id="filtre-priorite" class="form-select">
-        <option value="">Toutes</option>
-        <option value="Élevée">Élevée</option>
-        <option value="Moyenne">Moyenne</option>
-        <option value="Faible">Faible</option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label for="filtre-statut" class="form-label">Filtrer par statut :</label>
-      <select id="filtre-statut" class="form-select">
-        <option value="">Tous</option>
-        <option value="En cours">En cours</option>
-        <option value="Terminée">Terminée</option>
-      </select>
-    </div>
-  </div>
 
-  <!-- Tableau -->
-  <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Mes Pannes Affectées</h5>
+    <!-- En cours -->
+    <div class="tab-pane fade" id="encours">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-hourglass-split me-2"></i>Pannes en cours</span>
+          <span class="badge bg-light text-dark">{{ pannes_en_cours|length }}</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Titre</th>
+                  <th>Description</th>
+                  <th>Priorité</th>
+                  <th>Technicien</th>
+                  <th>date intervention</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for affectation in pannes_en_cours %}
+                <tr>
+                  <td>{{ affectation.panne.id }}</td>
+                  <td>{{ affectation.panne.titre }}</td>
+                  <td>{{ affectation.panne.description }}</td>
+                  <td>{{ affectation.panne.priority }}</td>
+                  <td>{{ affectation.technicien.username }}</td>
+                  <td>{{ affectation.date_intervention }}</td>
+                  <td>
+                    <form method="post" action="{% url 'pannes:statut' affectation.id %}" class="d-inline form-changement-statut">
+                      {% csrf_token %}
+                      <input type="hidden" name="affectation_id" value="{{ affectation.id }}">
+                      <input type="hidden" name="nouveau_statut" value="terminee">
+                      <button class="btn btn-sm btn-success me-1" data-statut="Terminée"><i class="bi bi-check-circle me-1"></i>Terminer</button>
+                    </form>
+                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#annulerModal{{ panne.id }}">
+                      <i class="bi bi-x-circle me-1"></i>Annuler
+                    </button>
+
+                    <!-- Modal Annulation -->
+                    <div class="modal fade" id="annulerModal{{ panne.id }}" tabindex="-1">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <form method="post" action="">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                              <h5 class="modal-title">Annuler la prise en charge</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                              <label>Motif :</label>
+                              <textarea class="form-control" name="motif" required></textarea>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="submit" class="btn btn-danger">Confirmer</button>
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Fin Modal -->
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted">Aucune panne en cours.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card-body p-0">
-      <table class="table table-hover mb-0" id="table-pannes">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Titre</th>
-            <th>Description</th>
-            <th>Priorité</th>
-            <th>Attribuée par</th>
-            <th>Date d'affectation</th>
-            <th>Statut</th>
-            <th>Date d'intervention</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Exemple de lignes (à générer dynamiquement si besoin) -->
-          <tr>
-            <td>1</td>
-            <td>Écran noir</td>
-            <td>Le PC ne démarre plus</td>
-            <td class="priorite">Élevée</td>
-            <td>Chef A</td>
-            <td>01/06/2025 10:15</td>
-            <td class="statut">
-              <select class="form-select form-select-sm statut-select">
-                <option value="En cours" selected>En cours</option>
-                <option value="Terminée">Terminée</option>
-              </select>
-            </td>
-            <td>--</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Connexion lente</td>
-            <td>Internet très lent</td>
-            <td class="priorite">Moyenne</td>
-            <td>Chef B</td>
-            <td>02/06/2025 11:30</td>
-            <td class="statut">
-              <select class="form-select form-select-sm statut-select">
-                <option value="En cours" selected>En cours</option>
-                <option value="Terminée">Terminée</option>
-              </select>
-            </td>
-            <td>03/06/2025 14:00</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Imprimante HS</td>
-            <td>Bourrage papier</td>
-            <td class="priorite">Faible</td>
-            <td>Chef C</td>
-            <td>04/06/2025 09:00</td>
-            <td class="statut">
-              <select class="form-select form-select-sm statut-select">
-                <option value="En cours" selected>En cours</option>
-                <option value="Terminée">Terminée</option>
-              </select>
-            </td>
-            <td>--</td>
-          </tr>
-        </tbody>
-      </table>
+
+    <!-- Terminées -->
+    <div class="tab-pane fade" id="termine">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-check-circle-fill me-2"></i>Pannes terminées</span>
+          <span class="badge bg-light text-dark">{{ pannes_terminees.paginator.count }}</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Description</th>
+                  <th>Date intervention</th>
+                  <th>Date fin</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for affectation in pannes_terminees %}
+                <tr>
+                  <td>{{ affectation.panne.id }}</td>
+                  <td>{{ affectation.panne.description }}</td>
+                  <td>{{ affectation.date_intervention }}</td>
+                  <td>{{ affectation.date_reparation }}</td>
+                  <td>
+                    <a href="" class="btn btn-outline-secondary btn-sm">
+                      <i class="bi bi-file-text me-1"></i>Fiche de réparation
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted">Aucune panne terminée.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <small class="text-muted">Page {{ pannes_terminees.number }} sur {{ pannes_terminees.paginator.num_pages }}</small>
+          <nav>
+            <ul class="pagination mb-0">
+              {% if pannes_terminees.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ pannes_terminees.previous_page_number }}">Précédent</a></li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+              {% endif %}
+              {% for num in pannes_terminees.paginator.page_range %}
+                <li class="page-item {% if num == pannes_terminees.number %}active{% endif %}">
+                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+              {% endfor %}
+              {% if pannes_terminees.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ pannes_terminees.next_page_number }}">Suivant</a></li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
     </div>
+
   </div>
 </div>
+{% endblock %}
 
-<!-- JS : Filtrage côté client -->
+{% block scripts %}
 <script>
-  const filtrePriorite = document.getElementById('filtre-priorite');
-  const filtreStatut = document.getElementById('filtre-statut');
-  const lignes = document.querySelectorAll('#table-pannes tbody tr');
+  document.querySelectorAll(".form-changement-statut").forEach(form => {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-  function filtrerLignes() {
-    const priorite = filtrePriorite.value;
-    const statut = filtreStatut.value;
+      const bouton = e.submitter; // Cible le bouton qui a déclenché submit
+      const statut = bouton.getAttribute("data-statut"); // Par ex. "Terminée"
 
-    lignes.forEach(row => {
-      const p = row.querySelector('.priorite').textContent.trim();
-      const s = row.querySelector('.statut').textContent.trim();
-
-      const visible =
-        (priorite === '' || p === priorite) &&
-        (statut === '' || s === statut);
-
-      row.style.display = visible ? '' : 'none';
+      Swal.fire({
+        title: "Confirmation",
+        text: `Voulez-vous vraiment passer la panne à l'état "${statut}" ?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Oui, confirmer",
+        cancelButtonText: "Annuler",
+        confirmButtonColor: "#0d6efd",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
     });
-  }
-
-  filtrePriorite.addEventListener('change', filtrerLignes);
-  filtreStatut.addEventListener('change', filtrerLignes);
+  });
 </script>
-
 {% endblock %}

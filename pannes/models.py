@@ -3,13 +3,6 @@ from accounts.models import User
 from materiels.models import Materiel
 
 class Panne(models.Model):
-    STATUS_CHOICES = [
-        ('nouvelle', 'Nouvelle'),
-        ('en_cours', 'En cours'),
-        ('resolue', 'Résolue'),
-        ('fermee', 'Fermée'),
-    ]
-
     PRIORITY_CHOICES = [
         ('haute', 'Haute'),
         ('moyenne', 'Moyenne'),
@@ -18,7 +11,6 @@ class Panne(models.Model):
     titre = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField()
     date_signalement = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='nouvelle')
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='moyenne')
     categorie_materiel = models.ForeignKey('materiels.CategorieMateriel', on_delete=models.CASCADE, related_name='pannes', default=1)
     materiel = models.ForeignKey(Materiel, on_delete=models.CASCADE, related_name='pannes', blank=True, null=True)
@@ -34,7 +26,18 @@ class AffectationPanne(models.Model):
     attribue_par = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role__name':'chef unite informatique'}, related_name='panne_attribue_par')
     date_affectation = models.DateTimeField(auto_now_add=True)
     date_intervention = models.DateTimeField(null=True, blank=True)
-    statut_reparation = models.CharField(max_length=20, choices=[('en_cours', 'En cours'), ('terminee', 'Terminée')])
+    date_reparation = models.DateTimeField(null=True, blank=True)
+    commentaire_intervention = models.TextField(null=True, blank=True)
+    statut_reparation = models.CharField(
+        max_length=20,
+        choices=[
+            ('non_traitee', 'Non traitée'),
+            ('en_cours', 'En cours'),
+            ('terminee', 'Terminée'),
+            ('annulee', 'Annulée')
+        ],
+        default='non_traitee'
+    )
 
     class Meta:
         constraints = [
