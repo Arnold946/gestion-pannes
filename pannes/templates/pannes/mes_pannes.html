@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load form_tags %}
 {% load static %}
-
+{% block page_title %}Mes Pannes{% endblock %}
 {% block content %}
 
 <div class="container-fluid px-4">
@@ -50,13 +50,34 @@
               </tr>
             </thead>
             <tbody>
+            {% for panne in pannes %}
               <tr>
-                <td>1</td>
-                <td>Écran noir</td>
-                <td>Le PC ne démarre plus</td>
-                <td><span class="badge bg-danger">Élevée</span></td>
-                <td><span class="badge bg-secondary">Non traitée</span></td>
-                <td>19/05/2025</td>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ panne.titre }}</td>
+                <td>{{ panne.description }}</td>
+                <td>
+                  {% if panne.priority == 'haute' %}
+                    <span class="badge bg-danger">haute</span>
+                  {% elif panne.priority == 'moyenne' %}
+                    <span class="badge bg-warning">Moyenne</span>
+                  {% elif panne.priority == 'basse' %}
+                    <span class="badge bg-danger">Faible</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% with panne.affectation_panne.all|first as affectation %}
+                  {% if affectation %}
+                    {% if affectation.statut_reparation == 'en_cours' %}
+                      <span class="badge bg-secondary">En cours</span>
+                    {% elif affectation.statut_reparation == 'terminee' %}
+                      <span class="badge bg-success">Terminée</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Non traitée</span>
+                    {% endif %}
+                  {% endif %}
+                  {% endwith %}
+                </td>
+                <td>{{ panne.date_signalement }}</td>
                 <td class="text-center">
                   <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
                 </td>
@@ -65,37 +86,9 @@
                   <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
-              <tr>
-                <td>2</td>
-                <td>Connexion Internet</td>
-                <td>Très lente dans le bureau B</td>
-                <td><span class="badge bg-warning text-dark">Moyenne</span></td>
-                <td><span class="badge bg-success">Résolue</span></td>
-                <td>18/05/2025</td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
-                </td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Imprimante HS</td>
-                <td>Erreur bourrage papier</td>
-                <td><span class="badge bg-primary">Faible</span></td>
-                <td><span class="badge bg-warning text-dark">En cours</span></td>
-                <td>17/05/2025</td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-info"><i class="bi bi-eye"></i></button>
-                </td>
-                <td class="text-center">
-                  <button class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
-                </td>
-              </tr>
-              <!-- Autres lignes -->
+            {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">Aucune panne déclarée.</td></tr>
+            {% endfor %}
             </tbody>
           </table>
         </div>

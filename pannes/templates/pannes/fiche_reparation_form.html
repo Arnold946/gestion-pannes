@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% load static %}
+
+{% block title %}Fiche de Réparation{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-header bg-primary text-white py-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-tools me-2 fs-4"></i>
+                            <h4 class="mb-0 fw-bold">Fiche de Réparation</h4>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form method="post" id="repairForm" novalidate>
+                          {% csrf_token %}
+                            <!-- Section Informations générales -->
+                            <div class="section-header mb-4">
+                                <h5 class="text-muted mb-3 d-flex align-items-center">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Informations générales
+                                </h5>
+                            </div>
+
+                            <!-- Titre de la panne -->
+                            <div class="mb-3">
+                                <label for="titrePanne" class="form-label fw-semibold text-dark">
+                                    Titre de la panne
+                                </label>
+                                <input
+                                    type="text"
+                                    id="titrePanne"
+                                    name="titre_panne"
+                                    class="form-control readonly-field"
+                                    value="{{ form.initial.titre }}"
+                                    readonly
+                                >
+                            </div>
+
+                            <!-- Description de la panne -->
+                            <div class="mb-3">
+                                <label for="descriptionPanne" class="form-label fw-semibold text-dark">
+                                    Description de la panne
+                                </label>
+                                <textarea
+                                    id="descriptionPanne"
+                                    name="description_panne"
+                                    class="form-control readonly-field"
+                                    rows="3"
+                                    readonly
+                                >{{ form.initial.description_panne }}</textarea>
+                            </div>
+
+                            <!-- Technicien et Attribué par -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="technicien" class="form-label fw-semibold text-dark">
+                                        Technicien
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="technicien"
+                                        name="technicien"
+                                        class="form-control readonly-field"
+                                        value="{{ form.initial.technicien.username }}"
+                                        readonly
+                                    >
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="attribuePar" class="form-label fw-semibold text-dark">
+                                        Attribué par
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="attribuePar"
+                                        name="attribue_par"
+                                        class="form-control readonly-field"
+                                        value="{{ form.initial.attribue_par.username }}"
+                                        readonly
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Dates -->
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="dateAffectation" class="form-label fw-semibold text-dark">
+                                        Date d'affectation
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="dateAffectation"
+                                        name="date_affectation"
+                                        class="form-control readonly-field"
+                                        value="{{ form.initial.date_affectation }}"
+                                        readonly
+                                    >
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="dateIntervention" class="form-label fw-semibold text-dark">
+                                        Date d'intervention
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="dateIntervention"
+                                        name="date_intervention"
+                                        class="form-control readonly-field"
+                                        value="{{ form.initial.date_intervention }}"
+                                        readonly
+                                    >
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="dateReparation" class="form-label fw-semibold text-dark">
+                                        Date de réparation
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="dateReparation"
+                                        name="date_reparation"
+                                        class="form-control readonly-field"
+                                        value=""
+                                        placeholder="À compléter"
+                                        readonly
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Séparateur -->
+                            <hr class="my-4 border-2">
+
+                            <!-- Section Description de l'intervention -->
+                            <div class="section-header mb-4">
+                                <h5 class="text-muted mb-3 d-flex align-items-center">
+                                    <i class="bi bi-clipboard-check me-2"></i>
+                                    Description de l'intervention
+                                </h5>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="descriptionIntervention" class="form-label fw-semibold text-dark">
+                                    Description de l'intervention <span class="text-danger">*</span>
+                                </label>
+                                {{ form.description_intervention|add_class:"form-control" }}
+                                {% if form.description_intervention.errors %}
+                                  <div class="text-danger mt-1">{{ form.description_intervention.errors }}</div>
+                                {% endif %}
+                                <div class="invalid-feedback" id="descriptionInterventionError">
+                                    Veuillez saisir une description de l'intervention.
+                                </div>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Minimum 20 caractères requis pour une description complète.
+                                </div>
+                            </div>
+
+                            <!-- Boutons d'action -->
+                            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i>
+                                    Retour
+                                </button>
+                                <button type="submit" class="btn btn-success btn-lg px-4">
+                                    <i class="bi bi-save me-2"></i>
+                                    Enregistrer la fiche
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div
+{% endblock %}

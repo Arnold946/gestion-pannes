@@ -6,10 +6,10 @@
         <div id="synthese-section" class="content-section">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="btn-group" role="group">
-                    <button class="btn btn-outline-primary active" data-period="day">Jour</button>
-                    <button class="btn btn-outline-primary" data-period="week">Semaine</button>
-                    <button class="btn btn-outline-primary" data-period="month">Mois</button>
-                    <button class="btn btn-outline-primary" data-period="year">Année</button>
+                    <a class="btn btn-outline-primary {% if periode == 'day' %}active{% endif %}" href="?periode=day" >Jour</a>
+                    <a class="btn btn-outline-primary {% if periode == 'week' %}active{% endif %}" href="?periode=week" >Semaine</a>
+                    <a class="btn btn-outline-primary {% if periode == 'month' %}active{% endif %}" href="?periode=month" >Mois</a>
+                    <a class="btn btn-outline-primary {% if periode == 'year' %}active{% endif %}" href="?periode=year" >Annee</a>
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
                     <div class="card border-primary">
                         <div class="card-body text-center">
                             <h5 class="card-title text-primary">Total Pannes</h5>
-                            <h2 class="text-primary" id="total-pannes">247</h2>
+                            <h2 class="text-primary" id="total-pannes">{{ total_pannes }}</h2>
                             <small class="text-muted">Cette période</small>
                         </div>
                     </div>
@@ -28,7 +28,7 @@
                     <div class="card border-success">
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Pannes Résolues</h5>
-                            <h2 class="text-success" id="pannes-resolues">198</h2>
+                            <h2 class="text-success" id="pannes-resolues">{{ pannes_resolues }}</h2>
                             <small class="text-muted">80% du total</small>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                     <div class="card border-warning">
                         <div class="card-body text-center">
                             <h5 class="card-title text-warning">En Cours</h5>
-                            <h2 class="text-warning" id="pannes-encours">35</h2>
+                            <h2 class="text-warning" id="pannes-encours">{{ total_en_cours }}</h2>
                             <small class="text-muted">14% du total</small>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                     <div class="card border-info">
                         <div class="card-body text-center">
                             <h5 class="card-title text-info">Taux Résolution</h5>
-                            <h2 class="text-info" id="taux-resolution">80%</h2>
+                            <h2 class="text-info" id="taux-resolution">{{ taux_resolution }}%</h2>
                             <small class="text-muted">+5%</small>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Description</th>
-                                    <th>Type</th>
+                                    <th>Materiel</th>
                                     <th>Localisation</th>
                                     <th>Priorité</th>
                                     <th>Technicien</th>
@@ -75,6 +75,32 @@
                             </thead>
                             <tbody>
                                 <!-- Data will be populated by JavaScript -->
+                                {% for affectation in pannes_en_cours %}
+                                <tr>
+                                    <td>{{ forloop.count }}</td>
+                                    <td>{{ affectation.panne.description }}</td>
+                                    <td>{{ affectation.panne.materiel.name }}</td>
+                                    <td>{{ affectation.panne.materiel.unite.name }}</td>
+                                    <td>
+                                      {% if affectation.panne.priority == 'haute' %}
+                                        <span class="badge bg-danger">haute</span>
+                                      {% elif affectation.panne.priority == 'moyenne' %}
+                                        <span class="badge bg-warning">Moyenne</span>
+                                      {% elif affectation.panne.priority == 'basse' %}
+                                        <span class="badge bg-danger">Faible</span>
+                                      {% endif %}
+                                    </td>
+                                    <td>{{ affectation.technicien.username }}</td>
+                                    <td>{{ affectation.panne.date_signalement|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-warning">En cours</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">Aucune panne en cours pour aujourd’hui.</td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>

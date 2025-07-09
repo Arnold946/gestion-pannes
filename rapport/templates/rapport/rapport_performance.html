@@ -11,7 +11,7 @@
                     <div class="card border-info">
                         <div class="card-body text-center">
                             <h5 class="card-title text-info" style="font-size:18px;">Temps Moyen de Résolution</h5>
-                            <h2 class="text-info">2.5h</h2>
+                            <h2 class="text-info">{{ temps_moyen }}h</h2>
                             <small class="text-muted">-30min vs mois dernier</small>
                         </div>
                     </div>
@@ -20,7 +20,7 @@
                     <div class="card border-success">
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Taux Respect Délais</h5>
-                            <h2 class="text-success">87%</h2>
+                            <h2 class="text-success">{{ taux_respect }}%</h2>
                             <small class="text-muted">+3% vs mois dernier</small>
                         </div>
                     </div>
@@ -29,7 +29,7 @@
                     <div class="card border-warning">
                         <div class="card-body text-center">
                             <h5 class="card-title text-warning">Score Performance</h5>
-                            <h2 class="text-warning">8.2/10</h2>
+                            <h2 class="text-warning">{{ score_performance }}/10</h2>
                             <small class="text-muted">Excellent niveau</small>
                         </div>
                     </div>
@@ -63,7 +63,13 @@
                                         </tr>
                                     </thead>
                                     <tbody id="performance-techniciens">
-                                        <!-- Data populated by JS -->
+                                        {% for tech in techniciens_perf %}
+                                        <tr>
+                                            <td>{{ tech.nom }}</td>
+                                            <td>{{ tech.resolues }}</td>
+                                            <td>{{ tech.score }}</td>
+                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
@@ -421,34 +427,41 @@ canvas {
 
 {% block scripts %}
     <script>
-        const data = {
-          labels: [
-            'Red',
-            'Green',
-            'Yellow',
-            'Grey',
-            'Blue'
-          ],
-          datasets: [{
-            label: 'My First Dataset',
-            data: [11, 16, 7, 3, 14],
-            backgroundColor: [
-              'rgb(255, 99, 132)',
-              'rgb(75, 192, 192)',
-              'rgb(255, 205, 86)',
-              'rgb(201, 203, 207)',
-              'rgb(54, 162, 235)'
-            ]
-          }]
-        };
+      const data = {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+          label: 'Score par technicien',
+          data: {{ chart_data|safe }},
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(75, 192, 192)',
+            'rgb(255, 205, 86)',
+            'rgb(201, 203, 207)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+            'rgb(255, 159, 64)',
+          ]
+        }]
+      };
 
-        const config = {
-          type: 'polarArea',
-          data: data,
-          options: {}
-        };
+      const config = {
+        type: 'polarArea',
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Scores de performance par technicien'
+            }
+          }
+        }
+      };
 
-        const ctx = document.getElementById('chart-performance').getContext('2d');
-        const monGraphique = new Chart(ctx, config);
+      const ctx = document.getElementById('chart-performance').getContext('2d');
+      new Chart(ctx, config);
     </script>
 {% endblock %}

@@ -275,55 +275,32 @@ canvas {
 
 {% block scripts %}
     <script>
-        const data1 = {
-          labels: [
-            'Red',
-            'Blue',
-            'Yellow'
-          ],
-          datasets: [{
-            label: 'My First Dataset',
-            data: [300, 50, 100],
-            backgroundColor: [
-              'rgb(255, 99, 132)',
-              'rgb(54, 162, 235)',
-              'rgb(255, 205, 86)'
-            ],
-            hoverOffset: 4
-          }]
-        };
+        const dataTypeMateriel = JSON.parse('{{ data_type_materiel|safe }}');
+    const dataLocalisation = JSON.parse('{{ data_localisation|safe }}');
 
-        const config1 = {
-          type: 'doughnut',
-          data: data1,
-        };
+    const config1 = {
+      type: 'doughnut',
+      data: {
+        labels: dataTypeMateriel.labels,
+        datasets: [{
+          label: 'Pannes par type de matériel',
+          data: dataTypeMateriel.data,
+          backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d']
+        }]
+      }
+    };
 
-        const data2 = {
-          labels: [
-            'Red',
-            'Green',
-            'Yellow',
-            'Grey',
-            'Blue'
-          ],
-          datasets: [{
-            label: 'My First Dataset',
-            data: [11, 16, 7, 3, 14],
-            backgroundColor: [
-              'rgb(255, 99, 132)',
-              'rgb(75, 192, 192)',
-              'rgb(255, 205, 86)',
-              'rgb(201, 203, 207)',
-              'rgb(54, 162, 235)'
-            ]
-          }]
-        };
-
-        const config2 = {
-          type: 'polarArea',
-          data: data2,
-          options: {}
-        };
+    const config2 = {
+      type: 'polarArea',
+      data: {
+        labels: dataLocalisation.labels,
+        datasets: [{
+          label: 'Pannes par unité',
+          data: dataLocalisation.data,
+          backgroundColor: ['#17a2b8', '#ffc107', '#6f42c1', '#20c997', '#fd7e14']
+        }]
+      }
+    };
 
 
         const data3 = {

@@ -11,5 +11,8 @@ urlpatterns = [
     path('liste_pannes', views.liste_pannes_et_techniciens_view, name='liste_pannes'),
     path('changer_statut/<int:affectation_id>/',views.changer_statut_affectation, name='statut'),
     path('exporter/', views.exporter_pannes_excel_view, name='exporter'),
+    path('fiche-reparation/print/<int:affectation_id>/', views.fiche_reparation_printable, name='fiche_reparation_print'),
+    path('fiche-reparation/<int:affectation_id>/', views.creer_fiche_de_reparation, name='fiche_reparation_form'),
+    path('fiches-reparation/', views.liste_fiches_reparation, name='liste_fiches_reparation'),
     path('ajax/charger-materiels/', views.charger_materiels, name='charger_materiels'),
 ]

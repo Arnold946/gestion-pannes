@@ -37,3 +37,17 @@ class AffectationPanneForm(forms.ModelForm):
             'panne': forms.Select(),
             'technicien': forms.Select(),
         }
+
+class FicheDeReparationForm(forms.Form):
+    titre = forms.CharField(label="titre de la panne", disabled=True)
+    description_panne =forms.CharField(label="Description de la panne", widget=forms.Textarea(attrs={'rows':3}), disabled="True")
+    date_affectation = forms.DateTimeField(label="Date d'affectation",disabled=True)
+    date_intervention = forms.DateTimeField(label="Date d’intervention", disabled=True)
+    date_reparation = forms.DateTimeField(label="Date de réparation", disabled=True)
+    technicien = forms.CharField(label="Technicien assigné", disabled=True)
+    attribue_par = forms.CharField(label="Attribué par", disabled=True)
+    description_intervention = forms.CharField(
+        label="Description de l’intervention",
+        widget=forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        required=True
+    )

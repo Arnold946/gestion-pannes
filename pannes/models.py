@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.timesince import timesince
+
 from accounts.models import User
 from materiels.models import Materiel
 
@@ -17,7 +19,7 @@ class Panne(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role__name':'utilisateur'}, related_name='panne_utilisateur')
 
     def __str__(self):
-        return f'{self.description} - {self.status} - {self.priority} - {self.user.username}'
+        return f'{self.description} - {self.date_signalement} - {self.priority} - {self.user.username}'
 
 
 class AffectationPanne(models.Model):
@@ -38,6 +40,11 @@ class AffectationPanne(models.Model):
         ],
         default='non_traitee'
     )
+
+    def temps_resolution(self):
+        if self.date_intervention and self.date_reparation:
+            return timesince(self.date_intervention, self.date_reparation)
+        return "N/A"
 
     class Meta:
         constraints = [

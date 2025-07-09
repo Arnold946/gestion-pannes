@@ -22,7 +22,13 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      <!-- Data populated by JS -->
+                                      {% for item in pannes_par_type %}
+                                        <tr>
+                                          <td>{{ item.categorie_materiel__name }}</td>
+                                          <td>{{ item.nombre }}</td>
+                                          <td>{{ item.pourcentage }}%</td>
+                                        </tr>
+                                      {% endfor %}
                                   </tbody>
                               </table>
                           </div>
@@ -45,7 +51,13 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      <!-- Data populated by JS -->
+                                      {% for item in pannes_par_unite %}
+                                        <tr>
+                                          <td>{{ item.materiel__unite__name }}</td>
+                                          <td>{{ item.nombre }}</td>
+                                          <td>{{ item.pourcentage }}%</td>
+                                        </tr>
+                                      {% endfor %}
                                   </tbody>
                               </table>
                           </div>
@@ -78,7 +90,22 @@
                               </tr>
                           </thead>
                           <tbody>
-                              <!-- Data populated by JS -->
+                              {% for affectation in pannes_resolues %}
+                                <tr>
+                                  <td>{{ forloop.counter }}</td>
+                                  <td>{{ affectation.panne.description }}</td>
+                                  <td>{{ affectation.panne.materiel.categorie.name }}</td>
+                                  <td>{{ affectation.technicien.username }}</td>
+                                  <td>{{ affectation.date_reparation|date:"d/m/Y H:i" }}</td>
+                                  <td>
+                                    {% if affectation.date_intervention and affectation.date_reparation %}
+                                      {{ affectation.temps_resolution }}
+                                    {% else %}
+                                      -
+                                    {% endif %}
+                                  </td>
+                                </tr>
+                              {% endfor %}
                           </tbody>
                       </table>
                   </div>

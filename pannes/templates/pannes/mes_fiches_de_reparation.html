@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block page_title %}Fiches de Réparation{% endblock %}
+{% block content %}
+<div class="container my-4">
+  <h2 class="mb-4"><i class="bi bi-tools"></i> Fiches de Réparation</h2>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Matériel</th>
+          <th>Description de la panne</th>
+          <th>Date d’affectation</th>
+          <th>Date de réparation</th>
+          <th>Commentaire</th>
+          <th>Technicien</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fiche in fiches %}
+        <tr>
+          <td>{{ fiche.panne.materiel.name }}</td>
+          <td>{{ fiche.panne.description }}</td>
+          <td>{{ fiche.date_affectation|date:"d/m/Y H:i" }}</td>
+          <td>{{ fiche.date_reparation|date:"d/m/Y H:i" }}</td>
+          <td>{{ fiche.commentaire_intervention }}</td>
+          <td>{{ fiche.technicien.username }}</td>
+          <td>
+            <a href="{% url 'pannes:fiche_reparation_print' fiche.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-printer"></i> Imprimer
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-muted">Aucune fiche de réparation trouvée.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

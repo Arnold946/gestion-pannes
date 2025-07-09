@@ -73,9 +73,9 @@
             </td>
             <td>
               <span class="badge
-                {% if panne.status == 'non_traitee' %}bg-secondary
+                {% if panne.status == 'terminee' %}bg-success
                 {% elif panne.status == 'en_cours' %}bg-warning text-dark
-                {% elif panne.status == 'termine' %}bg-success
+                {% else %}bg-secondary
                 {% endif %}">
                 {{ panne.get_status_display }}
               </span>

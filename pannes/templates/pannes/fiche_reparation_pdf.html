@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiche de Réparation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid print-container">
+        <div class="repair-sheet">
+            <!-- En-tête avec logo -->
+            <div class="header-section">
+                <div class="logo-container">
+                    <div class="logo-placeholder">
+                        <span>LOGO ENTREPRISE</span>
+                    </div>
+                </div>
+                <h1 class="main-title">FICHE DE RÉPARATION</h1>
+            </div>
+
+            <!-- Tableau des informations -->
+            <div class="info-section">
+                <table class="table repair-table">
+                    <tbody>
+                        <tr>
+                            <td class="field-label">Titre</td>
+                            <td class="field-value" id="titre">{{ affectation.panne.titre }}</td>
+                        </tr>
+                        <tr>
+                            <td class="field-label">Description de la panne</td>
+                            <td class="field-value" id="description">{{ affectation.panne.description }}</td>
+                        </tr>
+                        <tr>
+                            <td class="field-label">Date d'affectation</td>
+                            <td class="field-value" id="date-affectation">{{ affectation.date_affectation }}</td>
+                        </tr>
+                        <tr>
+                            <td class="field-label">Date d'intervention</td>
+                            <td class="field-value" id="date-intervention">{{ affectation.date_intervention }}</td>
+                        </tr>
+                        <tr>
+                            <td class="field-label">Technicien</td>
+                            <td class="field-value" id="technicien">{{ affectation.technicien.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="field-label">Attribué par</td>
+                            <td class="field-value" id="attribue-par">{{ affectation.attribue_par.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="field-label">Commentaire d'intervention</td>
+                            <td class="field-value comment-field" id="commentaire">{{ affectation.commentaire_intervention }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section signatures -->
+            <div class="signatures-section">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="signature-box">
+                            <h5 class="signature-title">Signature du technicien</h5>
+                            <p class="signature-label">Fait par : <span id="fait-par">{{ affectation.technicien.username }}</span></p>
+                            <div class="signature-area"></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="signature-box">
+                            <h5 class="signature-title">Signature responsable</h5>
+                            <p class="signature-label">Validé par : <span id="valide-par">{{ affectation.attribue_par.username }}</span></p>
+                            <div class="signature-area"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-section">
+                <div class="footer-line"></div>
+                <p class="footer-text">Fait le : {{ today }}<span id="date-generation"></span></p>
+            </div>
+            <div class="no-print mb-3">
+                    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> Imprimer</button>
+                </div>
+        </div>
+    </div>
+
+  <style>
+    * {
+    box-sizing: border-box;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+.print-container {
+    max-width: 210mm;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.repair-sheet {
+    padding: 30mm 20mm;
+    min-height: 297mm;
+    position: relative;
+}
+
+/* En-tête */
+.header-section {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 20px;
+}
+
+.logo-container {
+    margin-bottom: 20px;
+}
+
+.logo-placeholder {
+    width: 120px;
+    height: 80px;
+    border: 2px dashed #bdc3c7;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #6c757d;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Section informations */
+.info-section {
+    margin-bottom: 50px;
+}
+
+.repair-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: white;
+    margin-bottom: 0;
+}
+
+.repair-table td {
+    padding: 18px 20px;
+    border: none;
+    vertical-align: top;
+    position: relative;
+}
+
+.repair-table tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.3s ease;
+}
+
+.repair-table tr:last-child {
+    border-bottom: none;
+}
+
+.repair-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.repair-table tr:hover {
+    background-color: #e3f2fd;
+}
+
+.field-label {
+    font-weight: 700;
+    color: #34495e;
+    width: 30%;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white !important;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.field-value {
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 1rem;
+    background: white;
+}
+
+.comment-field {
+    min-height: 80px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-left: 4px solid #3498db;
+}
+
+/* Section signatures */
+.signatures-section {
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+
+.signature-box {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    height: 180px;
+    position: relative;
+}
+
+.signature-title {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 8px;
+}
+
+.signature-label {
+    color: #34495e;
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.signature-label span {
+    color: #3498db;
+    font-weight: 700;
+}
+
+.signature-area {
+    border-bottom: 2px solid #bdc3c7;
+    height: 60px;
+    position: relative;
+    margin-top: 20px;
+}
+
+.signature-area::after {
+    content: "Signature";
+    position: absolute;
+    right: 0;
+    bottom: -20px;
+    color: #95a5a6;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* Footer */
+.footer-section {
+    position: absolute;
+    bottom: 20mm;
+    left: 20mm;
+    right: 20mm;
+    text-align: center;
+}
+
+.footer-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #3498db 50%, transparent 100%);
+    margin-bottom: 15px;
+}
+
+.footer-text {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Styles d'impression */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+
+    .print-container {
+        box-shadow: none;
+        border-radius: 0;
+        max-width: none;
+        margin: 0;
+    }
+
+    .repair-sheet {
+        padding: 15mm;
+        min-height: auto;
+    }
+
+    .repair-table tr:hover {
+        background-color: inherit;
+    }
+
+    .repair-table tr:nth-child(even) {
+        background-color: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    .field-label {
+        background: #3498db !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    .signature-box {
+        background: white !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    .comment-field {
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    .logo-placeholder {
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    /* Éviter les coupures de page */
+    .signatures-section {
+        page-break-inside: avoid;
+    }
+
+    .repair-table {
+        page-break-inside: avoid;
+    }
+
+    .header-section {
+        page-break-after: avoid;
+    }
+}
+
+/* Responsive pour l'aperçu écran */
+@media (max-width: 768px) {
+    .repair-sheet {
+        padding: 20px;
+    }
+
+    .main-title {
+        font-size: 1.8rem;
+    }
+
+    .field-label {
+        font-size: 0.8rem;
+    }
+
+    .signature-box {
+        margin-bottom: 20px;
+        height: auto;
+        min-height: 150px;
+    }
+}
+
+/* Animations subtiles */
+.repair-table tr {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.signature-box {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.signature-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Amélioration de la lisibilité */
+.field-value {
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Style pour les données importantes */
+#titre {
+    font-weight: 700;
+    color: #2980b9;
+    font-size: 1.1rem;
+}
+
+#date-affectation,
+#date-intervention {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #27ae60;
+}
+
+#technicien,
+#attribue-par {
+    font-weight: 600;
+    color: #8e44ad;
+}
+  </style>
+</body>
+</html>

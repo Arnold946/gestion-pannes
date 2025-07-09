@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Bouton Export -->
+  <div class="row container">
+    <div class="col bg-white shadow-sm p-1 rounded-3 mb-3">
+      <a href="{% url 'pannes:exporter' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-download me-2"></i>Exporter
+      </a>
+    </div>
+  </div>
+
+    <!-- Terminées -->
+    <div class="tab-pane fade" id="termine">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-check-circle-fill me-2"></i>Pannes terminées</span>
+          <span class="badge bg-light text-dark">{{ pannes_terminees.paginator.count }}</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Description</th>
+                  <th>Date intervention</th>
+                  <th>Date fin</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for affectation in pannes_terminees %}
+                <tr>
+                  <td>{{ affectation.panne.id }}</td>
+                  <td>{{ affectation.panne.description }}</td>
+                  <td>{{ affectation.date_intervention }}</td>
+                  <td>{{ affectation.date_reparation }}</td>
+                  <td>
+                    <a href="{% url 'pannes:fiche_reparation_form' affectation.id %}" class="btn btn-outline-secondary btn-sm">
+                      <i class="bi bi-file-text me-1"></i>Fiche de réparation
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted">Aucune panne terminée.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <small class="text-muted">Page {{ pannes_terminees.number }} sur {{ pannes_terminees.paginator.num_pages }}</small>
+          <nav>
+            <ul class="pagination mb-0">
+              {% if pannes_terminees.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ pannes_terminees.previous_page_number }}">Précédent</a></li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+              {% endif %}
+              {% for num in pannes_terminees.paginator.page_range %}
+                <li class="page-item {% if num == pannes_terminees.number %}active{% endif %}">
+                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+              {% endfor %}
+              {% if pannes_terminees.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ pannes_terminees.next_page_number }}">Suivant</a></li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll(".form-changement-statut").forEach(form => {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const bouton = e.submitter; // Cible le bouton qui a déclenché submit
+      const statut = bouton.getAttribute("data-statut"); // Par ex. "Terminée"
+
+      Swal.fire({
+        title: "Confirmation",
+        text: `Voulez-vous vraiment passer la panne à l'état "${statut}" ?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Oui, confirmer",
+        cancelButtonText: "Annuler",
+        confirmButtonColor: "#0d6efd",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

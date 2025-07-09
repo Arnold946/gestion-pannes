@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% block page_title %}Mes tickets{% endblock %}
 {% block content %}
 <div class="container mt-4">
 
@@ -182,7 +182,7 @@
                   <td>{{ affectation.date_intervention }}</td>
                   <td>{{ affectation.date_reparation }}</td>
                   <td>
-                    <a href="" class="btn btn-outline-secondary btn-sm">
+                    <a href="{% url 'pannes:fiche_reparation_form' affectation.id %}" class="btn btn-outline-secondary btn-sm">
                       <i class="bi bi-file-text me-1"></i>Fiche de réparation
                     </a>
                   </td>

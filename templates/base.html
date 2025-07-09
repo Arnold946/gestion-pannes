@@ -27,14 +27,18 @@
             {% endif %}
             <div class="user-profile p-3 mt-auto">
                 <div class="d-flex align-items-center">
-                    <img src="" alt="Profile" class="rounded-circle me-2" width="40">
+                    {% if request.user.profile_picture %}
+                      <img src="{{ request.user.profile_picture.url }}" alt="Profile" class="rounded-circle me-2" width="40">
+                    {% else %}
+                      <img src="{% static 'img/default-profile.png' %}" alt="Profile" class="rounded-circle me-2" width="40">
+                    {% endif %}
                     <div>
-                        <h6 class="mb-0"></h6>
-                        <small>Admin</small>
+                        <h6 class="mb-0">{{ request.user.username}}</h6>
+                        <small>{{ request.user.role.name|capfirst }}</small>
                     </div>
                 </div>
                 <div class="mt-3">
-                    <a href="#" class="text-white-50"><i class="bi bi-box-arrow-right me-2"></i>Déconnexion</a>
+                    <a href="{% url 'accounts:logout' %}" class="text-white-50"><i class="bi bi-box-arrow-right me-2"></i>Déconnexion</a>
                 </div>
             </div>
         </nav>

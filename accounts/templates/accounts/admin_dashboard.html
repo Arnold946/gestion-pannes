@@ -6,26 +6,26 @@
         <!-- Cards -->
         <div class="row mb-1">
             <div class="col-md-4">
-                <div class="card text-white">
+                <div class="card text-black">
                     <div class="card-body">
                         <h5 class="card-title">Total Pannes</h5>
-                        <h2 class="mb-0">1,234</h2>
+                        <h2 class="mb-0">{{ total_pannes }}</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card text-white">
+                <div class="card text-black">
                     <div class="card-body">
                         <h5 class="card-title">En cours</h5>
-                        <h2 class="mb-0">456</h2>
+                        <h2 class="mb-0">{{ pannes_en_cours }}</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card text-white">
+                <div class="card text-black">
                     <div class="card-body">
                         <h5 class="card-title">Résolues</h5>
-                        <h2 class="mb-0">778</h2>
+                        <h2 class="mb-0">{{ pannes_resolues }}</h2>
                     </div>
                 </div>
             </div>
@@ -56,24 +56,36 @@
                             </tr>
                         </thead>
                         <tbody>
+                        {% for panne in pannes_recentes %}
                             <tr>
-                                <td>Écran ne s’allume plus</td>
-                                <td><span class="badge bg-danger">Haute</span></td>
-                                <td><span class="badge bg-warning text-dark">En cours</span></td>
-                                <td>2025-05-14</td>
+                                <td>{{ panne.titre }}</td>
+                                <td>
+                                    {% if panne.priority == 'haute' %}
+                                        <span class="badge bg-danger">Haute</span>
+                                    {% elif panne.priority == 'moyenne' %}
+                                        <span class="badge bg-secondary">Moyenne</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">Faible</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% with panne.affectation_panne.last as affectation %}
+                                        {% if affectation %}
+                                          {% if affectation.statut_reparation == 'en_cours' %}
+                                            <span class="badge bg-warning text-dark">En cours</span>
+                                          {% elif affectation.statut_reparation == 'terminee' %}
+                                            <span class="badge bg-success">Résolue</span>
+                                          {% else %}
+                                            <span class="badge bg-danger">Non traitée</span>
+                                          {% endif %}
+                                        {% else %}
+                                          <span class="badge bg-dark">Non assignée</span>
+                                        {% endif %}
+                                  {% endwith %}
+                                </td>
+                                <td>{{ panne.date_signalement|date:"Y-m-d" }}</td>
                             </tr>
-                            <tr>
-                                <td>Connexion réseau instable</td>
-                                <td><span class="badge bg-secondary">Moyenne</span></td>
-                                <td><span class="badge bg-success">Résolue</span></td>
-                                <td>2025-05-13</td>
-                            </tr>
-                            <tr>
-                                <td>Imprimante ne répond pas</td>
-                                <td><span class="badge bg-primary">Faible</span></td>
-                                <td><span class="badge bg-danger">Non traitée</span></td>
-                                <td>2025-05-12</td>
-                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -119,43 +131,52 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('dimensions').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
-                datasets: [{
-                    label: 'pannes (en €)',
-                    data: [3000, 5000, 4000, 7000, 6000, 8000],
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
-        });
+document.addEventListener('DOMContentLoaded', function () {
+    const moisLabels = {{ mois_labels|safe }};
+    const moisData = {{ mois_data|safe }};
+    const prioriteLabels = {{ priorites|safe }};
+    const prioriteData = {{ priorite_data|safe }};
 
-        const ctx2 = document.getElementById('dimension').getContext('2d');
-        new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
-                datasets: [{
-                    label: 'Chiffres (en milliers €)',
-                    data: [3, 5, 2, 8, 7, 6],
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 2,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: true } },
-                plugins: { legend: { display: true, position: 'top' } }
-            }
-        });
+    const ctx = document.getElementById('dimensions').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: moisLabels,
+            datasets: [{
+                label: 'Pannes par mois',
+                data: moisData,
+                backgroundColor: 'rgba(13, 110, 253, 0.3)',
+                borderColor: '#0d6efd',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+        }
     });
+
+    const ctx2 = document.getElementById('dimension').getContext('2d');
+    new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: prioriteLabels.map(p => p.charAt(0).toUpperCase() + p.slice(1)),
+            datasets: [{
+                label: 'Pannes par priorité',
+                data: prioriteData,
+                backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                borderColor: 'rgba(25, 135, 84, 1)',
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } },
+            plugins: { legend: { display: true, position: 'top' } }
+        }
+    });
+});
 </script>
 {% endblock %}
+

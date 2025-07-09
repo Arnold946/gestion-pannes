@@ -1,20 +1,25 @@
+import tempfile
+
 import openpyxl
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render, get_object_or_404
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, get_template
 from django.utils.timezone import now
 from django.views.decorators.http import require_POST
 from openpyxl.styles import Font, PatternFill, Alignment
 
 from accounts.models import PermissionInterface, User
 from materiels.models import Materiel, CategorieMateriel
-from pannes.forms import AffectationPanneForm, PanneForm
+from pannes.forms import AffectationPanneForm, PanneForm, FicheDeReparationForm
 from pannes.models import Panne, AffectationPanne, Notification
 
 
 # Create your views here.
+@login_required
 def liste_pannes_et_techniciens_view(request):
     pannes = Panne.objects.all()
     techniciens = User.objects.filter(role__name='technicien')
@@ -66,6 +71,7 @@ def affecter_pannes_view(request):
         return redirect('pannes:liste_pannes')
     return redirect('pannes:liste_pannes')
 
+@login_required
 def mes_pannes_view(request):
     # Vérifie les permissions
     permission = PermissionInterface.objects.filter(
@@ -87,9 +93,15 @@ def mes_pannes_view(request):
         form = PanneForm()
 
     categories = CategorieMateriel.objects.all()
-    pannes = Panne.objects.filter(user=request.user)  # liste des pannes à afficher
+    pannes = Panne.objects.filter(user=request.user).prefetch_related(
+        Prefetch(
+            'affectation_panne',
+            queryset=AffectationPanne.objects.order_by('-date_affectation')
+        )
+    )
     return render(request, 'pannes/mes_pannes.html', {'form': form, 'pannes': pannes, 'categories':categories})
 
+@login_required
 def mes_pannes_attribuees(request):
     technicien = request.user
     affectations = AffectationPanne.objects.filter(technicien=technicien)
@@ -103,6 +115,7 @@ def mes_pannes_attribuees(request):
         "pannes_terminees": pannes_terminees,
     })
 
+@login_required
 def changer_statut_affectation(request, affectation_id):
     affectation = get_object_or_404(AffectationPanne, id=affectation_id, technicien=request.user)
     nouveau_statut = request.POST.get('nouveau_statut')
@@ -181,3 +194,60 @@ def charger_materiels(request):
     materiels = Materiel.objects.filter(categorie_id=categorie_id).order_by('name')
     html = render_to_string('pannes/includes/option_materiels.html', {'materiels': materiels})
     return HttpResponse(html)
+
+@login_required
+def creer_fiche_de_reparation(request, affectation_id):
+    affect = get_object_or_404(AffectationPanne, id=affectation_id, technicien=request.user)
+
+    initial_data = {
+        'titre': affect.panne.titre,
+        'description_panne': affect.panne.description,
+        'date_affectation': affect.date_affectation,
+        'date_intervention': affect.date_intervention,
+        'date_reparation': affect.date_intervention if affect.statut_reparation == 'terminee' else '',
+        'technicien': affect.technicien.username,
+        'attribue_par': affect.attribue_par.username,
+    }
+
+    if request.method == 'POST':
+        form = FicheDeReparationForm(request.POST, initial=initial_data)
+        if form.is_valid():
+            intervention = form.cleaned_data.get('description_intervention')
+            affect.commentaire_intervention = intervention
+            affect.save()
+            return redirect('pannes:fiche_reparation_print', affectation_id=affect.id)
+    else:
+        # Ici on initialise form pour les requêtes GET
+        form = FicheDeReparationForm(initial=initial_data)
+
+    # Cette ligne sera toujours atteinte (POST invalide ou GET)
+    return render(request, 'pannes/fiche_reparation_form.html', {
+        'form': form,
+        'affectation': affect,
+    })
+
+@login_required
+def fiche_reparation_printable(request, affectation_id):
+    affectation = get_object_or_404(AffectationPanne, id=affectation_id)
+    today = now().date()
+    return render(request, 'pannes/fiche_reparation_pdf.html', {
+        'affectation': affectation,
+        'today' : today,
+    })
+
+
+@login_required
+def liste_fiches_reparation(request):
+    if request.user.role.name == 'technicien':
+        fiches = AffectationPanne.objects.filter(
+            technicien=request.user,
+            statut_reparation='terminee',
+            commentaire_intervention__isnull=False
+        )
+    else:
+        fiches = AffectationPanne.objects.filter(
+            statut_reparation='terminee',
+            commentaire_intervention__isnull=False
+        )
+
+    return render(request, 'pannes/mes_fiches_de_reparation.html', {'fiches': fiches})

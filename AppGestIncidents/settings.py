@@ -160,3 +160,6 @@ AUTHENTICATION_BACKENDS = [
     'accounts.backends.EmailAuthBackend',  # notre backend personnalisé
     'django.contrib.auth.backends.ModelBackend',  # (optionnel pour la compatibilité avec admin)
 ]
+
+LOGIN_URL = '/utilisateurs/login/'
+LOGOUT_REDIRECT_URL = '/utilisateurs/login/'
