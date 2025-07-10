@@ -60,7 +60,7 @@ def affecter_pannes_view(request):
                 Notification.objects.create(
                     utilisateur=technicien,
                     panne=panne,
-                    message=f"Panne assignée à {panne.user}",
+                    message=f"Panne assignée à <strong>{technicien.username}</strong> par {chef.username}."
                 )
                 messages.success(request, "La panne a bien été atribuée")
         except Panne.DoesNotExist:
@@ -88,6 +88,13 @@ def mes_pannes_view(request):
             panne = form.save(commit=False)
             panne.user = request.user
             panne.save()
+            chefs = User.objects.filter(role__name='chef unite informatique')
+            for chef in chefs:
+                Notification.objects.create(
+                    utilisateur=chef,
+                    panne=panne,
+                    message=f"Nouvelle panne signalée par <strong>{request.user.username}</strong>."
+                )
             return redirect('pannes:mes_pannes')  # rechargement de la page avec la nouvelle panne
     else:
         form = PanneForm()
@@ -125,10 +132,20 @@ def changer_statut_affectation(request, affectation_id):
             affectation.statut_reparation = 'en_cours'
             affectation.date_intervention = now()
             affectation.save()
+            Notification.objects.create(
+                utilisateur=affectation.attribue_par,  # le chef
+                panne=affectation.panne,
+                message=f"<strong>{request.user.username}</strong> a commencé la réparation de la panne #{affectation.panne.id}."
+            )
         elif affectation.statut_reparation == 'en_cours' and nouveau_statut == 'terminee':
             affectation.statut_reparation = 'terminee'
             affectation.date_reparation = now()
             affectation.save()
+            Notification.objects.create(
+                utilisateur=affectation.attribue_par,
+                panne=affectation.panne,
+                message=f"Panne #{affectation.panne.id} terminée par <strong>{request.user.username}</strong>."
+            )
     return redirect('pannes:mes_pannes_attr')
 
 @require_POST
@@ -215,6 +232,12 @@ def creer_fiche_de_reparation(request, affectation_id):
             intervention = form.cleaned_data.get('description_intervention')
             affect.commentaire_intervention = intervention
             affect.save()
+            Notification.objects.create(
+                utilisateur=affect.attribue_par,
+                panne=affect.panne,
+                message=f"<strong>Rapport</strong> envoyé pour la panne #{affect.panne.id} par {request.user.username}."
+            )
+
             return redirect('pannes:fiche_reparation_print', affectation_id=affect.id)
     else:
         # Ici on initialise form pour les requêtes GET
@@ -251,3 +274,9 @@ def liste_fiches_reparation(request):
         )
 
     return render(request, 'pannes/mes_fiches_de_reparation.html', {'fiches': fiches})
+
+
+@login_required
+def toutes_notifications_view(request):
+    notifications = Notification.objects.filter(utilisateur=request.user).order_by('-date_envoi')
+    return render(request, 'pannes/notification.html', {'notifications': notifications})

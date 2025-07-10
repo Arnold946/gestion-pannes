@@ -14,5 +14,6 @@ urlpatterns = [
     path('fiche-reparation/print/<int:affectation_id>/', views.fiche_reparation_printable, name='fiche_reparation_print'),
     path('fiche-reparation/<int:affectation_id>/', views.creer_fiche_de_reparation, name='fiche_reparation_form'),
     path('fiches-reparation/', views.liste_fiches_reparation, name='liste_fiches_reparation'),
+    path('notifications/', views.toutes_notifications_view, name='toutes_notifications'),
     path('ajax/charger-materiels/', views.charger_materiels, name='charger_materiels'),
 ]

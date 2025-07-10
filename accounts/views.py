@@ -17,7 +17,7 @@ from accounts.models import PermissionInterface, User
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 
-from pannes.models import Panne, AffectationPanne
+from pannes.models import Panne, AffectationPanne, Notification
 
 
 # Create your views here.
@@ -129,6 +129,8 @@ def change_password(request):
 
 @login_required
 def admin_dashboard(request):
+    utilisateur = request.user
+    notifications = Notification.objects.filter(utilisateur=utilisateur).order_by('-date_envoi')[:3]
     total_pannes = Panne.objects.count()
     pannes_en_cours = AffectationPanne.objects.filter(statut_reparation = 'en_cours').count()
     pannes_resolues = AffectationPanne.objects.filter(statut_reparation = 'terminee').count()
@@ -175,7 +177,8 @@ def admin_dashboard(request):
         'mois_labels': mois_labels,
         'mois_data': mois_data,
         'priorites': priorites,
-        'priorite_data': priorite_data
+        'priorite_data': priorite_data,
+        'notifications' : notifications
     })
 @login_required
 def technician_dashboard(request):

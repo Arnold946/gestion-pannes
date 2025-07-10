@@ -15,41 +15,50 @@
     </a>
   </li>
 
-  <!-- Sous-menu Rapports -->
+  <!-- 🔔 Onglet Notifications -->
+  <li>
+    <a href="{% url 'pannes:toutes_notifications' %}">
+      <i class="bi bi-bell-fill me-2"></i>Notifications
+    </a>
+  </li>
+
+  <!-- 🛠️ Onglet Fiche de réparation -->
+  <li>
+    <a href="{% url 'pannes:liste_fiches_reparation' %}">
+      <i class="bi bi-journal-text me-2"></i>Fiches de réparation
+    </a>
+  </li>
+
+  <!-- 📊 Sous-menu Rapports -->
   <li>
     <a href="#submenuRapport" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
       <i class="bi bi-file-text-fill me-2"></i>Rapports
     </a>
     <ul class="collapse list-unstyled ps-4" id="submenuRapport">
       <li>
-          <a href="{% url 'rapports:synthese' %}">
-              <i class="fas fa-chart-line me-2"></i>
-              Rapport de synthèse
-          </a>
+        <a href="{% url 'rapports:synthese' %}">
+          <i class="fas fa-chart-line me-2"></i>Rapport de synthèse
+        </a>
       </li>
       <li>
-          <a href="{% url 'rapports:detaille' %}">
-              <i class="fas fa-list-alt me-2"></i>
-              Rapport détaillé
-          </a>
+        <a href="{% url 'rapports:detaille' %}">
+          <i class="fas fa-list-alt me-2"></i>Rapport détaillé
+        </a>
       </li>
       <li>
-          <a href="{% url 'rapports:statistique' %}">
-              <i class="fas fa-chart-pie me-2"></i>
-              Rapport statistique
-          </a>
+        <a href="{% url 'rapports:statistique' %}">
+          <i class="fas fa-chart-pie me-2"></i>Rapport statistique
+        </a>
       </li>
       <li>
-          <a href="{% url 'rapports:performance' %}">
-              <i class="fas fa-tachometer-alt me-2"></i>
-              Rapport performance
-          </a>
+        <a href="{% url 'rapports:performance' %}">
+          <i class="fas fa-tachometer-alt me-2"></i>Rapport performance
+        </a>
       </li>
       <li>
-          <a href="{% url 'rapports:maintenance' %}">
-              <i class="fas fa-wrench me-2"></i>
-              Rapport maintenance
-          </a>
+        <a href="{% url 'rapports:maintenance' %}">
+          <i class="fas fa-wrench me-2"></i>Rapport maintenance
+        </a>
       </li>
     </ul>
   </li>

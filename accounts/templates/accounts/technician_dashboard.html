@@ -48,38 +48,36 @@
 
     <!-- Notifications -->
     <div class="col-md-3 div-scrollable">
-        <div style=" overflow-y: auto;  height:85vh; background: #fff; border-radius: 8px; box-shadow: var(--card-shadow); padding: 1rem;">
-            <h5 class="mb-3">Notifications</h5>
-            <div class="d-flex align-items-start mb-3 p-2 rounded" style="background-color: #f8f9fa;">
-                <i class="bi bi-exclamation-circle text-danger me-2 fs-5"></i>
-                <div>
-                    <small class="text-muted">Il y a 2 min</small>
-                    <p class="mb-0">Nouvelle panne signalée par <strong>arnold tsobeng</strong>.</p>
-                </div>
-            </div>
+    <div style="overflow-y: auto; height:85vh; background: #fff; border-radius: 8px; box-shadow: var(--card-shadow); padding: 1rem;">
+        <h5 class="mb-3">Notifications</h5>
 
-            <div class="d-flex align-items-start mb-3 p-2 rounded" style="background-color: #f8f9fa;">
-                <i class="bi bi-person-check text-primary me-2 fs-5"></i>
-                <div>
-                    <small class="text-muted">Il y a 10 min</small>
-                    <p class="mb-0">Panne assignée à <strong>Technicien 3</strong>.</p>
+        {% if notifications_utilisateur %}
+            {% for notif in notifications_utilisateur %}
+                <div class="d-flex align-items-start mb-3 p-2 rounded" style="background-color: #f8f9fa;">
+                    {% comment %} Choix d'icône selon le type de message {% endcomment %}
+                    {% if "assignée" in notif.message %}
+                        <i class="bi bi-person-check text-primary me-2 fs-5"></i>
+                    {% elif "Rapport" in notif.message or "fiche" in notif.message %}
+                        <i class="bi bi-file-earmark-text text-success me-2 fs-5"></i>
+                    {% else %}
+                        <i class="bi bi-exclamation-circle text-danger me-2 fs-5"></i>
+                    {% endif %}
+                    <div>
+                        <small class="text-muted">{{ notif.date_envoi|timesince }} ago</small>
+                        <p class="mb-0">{{ notif.message|safe }}</p>
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted text-center">Aucune notification</p>
+        {% endif %}
 
-            <div class="d-flex align-items-start mb-3 p-2 rounded" style="background-color: #f8f9fa;">
-                <i class="bi bi-file-earmark-text text-success me-2 fs-5"></i>
-                <div>
-                    <small class="text-muted">Aujourd’hui 10:30</small>
-                    <p class="mb-0"><strong>Rapport</strong> envoyé pour la panne #456.</p>
-                </div>
-            </div>
-            <!-- ... autres notifications ... -->
-            <div class="text-center mt-3">
-                <a href="#" class="btn btn-sm btn-outline-primary">Voir tout</a>
-            </div>
+        <div class="text-center mt-3">
+            <a href="" class="btn btn-sm btn-outline-primary">Voir tout</a>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
